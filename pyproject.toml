@@ -1,0 +1,38 @@
+[project]
+name = "finngraph-ai"
+version = "0.1.0"
+description = "Extraction pipeline and query API for a knowledge graph of business relationships mined from Korean financial and economic news."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "datasets>=5.0.0",
+    "fastapi[standard]>=0.139.0",
+    "google-generativeai>=0.8.6",
+    "kiwipiepy>=0.23.2",
+    "kss>=6.0.6",
+    "langchain>=1.3.11",
+    "langchain-core>=1.4.8",
+    "langchain-google-genai>=4.2.6",
+    "langchain-openai>=1.3.3",
+    "langchain-text-splitters>=1.1.2",
+    "langgraph>=1.2.6",
+    "neo4j>=6.2.0",
+    "openai>=2.44.0",
+    "pandas>=3.0.3",
+    "pydantic-settings>=2.14.2",
+    "python-dotenv>=1.2.2",
+    "sentencepiece>=0.2.1",
+    "torch>=2.12.1",
+    "tqdm>=4.68.3",
+    "transformers>=5.12.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-mock>=3.15.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
