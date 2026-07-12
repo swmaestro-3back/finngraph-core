@@ -1,3 +1,10 @@
+"""
+나중에 할 것
+
+1. kiwipipey의 분석 결과를 전체 다 들고 가지말고 필요한 것들만 추출해서 State로 넘기기
+2. 필요없는거 None 처리하거나 Subgraph 처리하기
+"""
+
 from kiwipiepy import Kiwi, Sentence
 
 _kiwi = Kiwi()
