@@ -1,3 +1,5 @@
+import re
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from app.core.llm import get_llm
@@ -31,4 +33,7 @@ class Cleaner:
         self._chain = _prompt | llm | StrOutputParser()
 
     def clean(self, text: str) -> str:
-        return self._chain.invoke({"text": text})
+        cleaned = self._chain.invoke({"text": text})
+        # LLM이 프롬프트만으로 개행/탭을 항상 지우진 않으므로, 남은 공백류(\n, \t, \r 등
+        # 연속 공백 포함)를 스페이스 하나로 정규화해 단어가 붙지 않게 한다.
+        return re.sub(r"\s+", " ", cleaned).strip()
