@@ -1,20 +1,29 @@
+"""
+현재 KPF-bert-ner 모델은 내부적으로 한 문장씩 청킹하여 처리한다.
+따라서 문단을 넣어도 내부적으로 split sentences를 통해
+문장 분할을 하고 for sent in sentences로 NER 작업을 진행한다.
+따라서 현 프로젝트에서는 형태소 분할을 하는 kiwi도 한 문장 단위로 진행되어 split sentences를 하는 점을 파악하여
+형태소분할할때 진행된 분할된 문장들을 그대로 사용하여 현재 NER 함수에는 하나의 문장이 입력으로 들어온다.
+"""
 import torch
 from transformers import AutoTokenizer, BertForTokenClassification, logging as hf_logging
 
 from app.graph.utils.kpf_labels import ID2LABEL, kpf_to_pipeline
 from app.graph.models import Entity
 
+#  transformers 라이브러리 자체의 로그 레벨을 ERROR로 올려서,
+# 평소 INFO/WARNING 레벨로 출력되는 로딩 관련 메시지들을 조용히 시키는 용도
 hf_logging.set_verbosity_error()
 
-MODEL_NAME = "KPF/KPF-bert-ner"
+MODEL_PATH = "./KPF-bert-ner"
 # chunking 노드가 이미 512자 이내로 잘라서 넘겨주므로 문장 단위 재분할 없이 청크를
 # 통째로 추론한다. 모델의 max_position_embeddings가 512라 truncation으로 안전장치를 둔다.
 MAX_LENGTH = 512
 
 class NER:
     def __init__(self):
-        self._tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-        self._model = BertForTokenClassification.from_pretrained(MODEL_NAME)
+        self._tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+        self._model = BertForTokenClassification.from_pretrained(MODEL_PATH)
         self._model.eval()
 
     def extract_entities(self, text: str) -> list[Entity]:
@@ -36,10 +45,11 @@ class NER:
 
         return entities
 
+    # 여기서의 text는 cleaning node에 의해 줄바꿈과 같은 기호들이 모두 제거된 한 개의 문장.
     def _ner_predict(self, text: str) -> list[dict]:
         """KPF 공식 ner_module.py 로직 기반 (CPU 버전)."""
         # KPF 모델 학습 시 공백을 '-'로 치환했으므로 추론 시에도 동일하게 적용
-        text_dashed = text.replace('\n', ' ').replace(" ", "-")
+        text_dashed = text.replace(" ", "-")
         inputs = self._tokenizer(
             text_dashed, return_tensors="pt", truncation=True, max_length=MAX_LENGTH
         )
