@@ -15,6 +15,10 @@ from app.graph.models import Entity
 # 평소 INFO/WARNING 레벨로 출력되는 로딩 관련 메시지들을 조용히 시키는 용도
 hf_logging.set_verbosity_error()
 
+# inter-op pytorch 내부 병렬화 제거
+# 한 번의 forward pass마다 하나의 내부 스레드 사용하도록
+torch.set_num_threads(1)
+
 MODEL_PATH = "./KPF-bert-ner"
 # chunking 노드가 이미 512자 이내로 잘라서 넘겨주므로 문장 단위 재분할 없이 청크를
 # 통째로 추론한다. 모델의 max_position_embeddings가 512라 truncation으로 안전장치를 둔다.
@@ -50,12 +54,17 @@ class NER:
         """KPF 공식 ner_module.py 로직 기반 (CPU 버전)."""
         # KPF 모델 학습 시 공백을 '-'로 치환했으므로 추론 시에도 동일하게 적용
         text_dashed = text.replace(" ", "-")
+
         inputs = self._tokenizer(
-            text_dashed, return_tensors="pt", truncation=True, max_length=MAX_LENGTH
+            text_dashed,            # 이 텍스트를 토큰화하고
+            return_tensors="pt",    # 모델이 이해할 수 있는 pytorch 텐서(pt) 형태로 변환하고
+            truncation=True,        # 최대길이를 넘어가면 잘라버려라
+            max_length=MAX_LENGTH
         )
 
+        # 기울기 계산 끄기 - 추론/예측 단계이므로
         with torch.no_grad():
-            outputs = self._model(**inputs)
+            outputs = self._model(**inputs) # 토큰화된 데이터를 모델에 넣어 예측 결과 받기
 
         token_prediction_list = outputs.logits.argmax(dim=2).squeeze(0).tolist()
         pred_str = [ID2LABEL[l] for l in token_prediction_list]
