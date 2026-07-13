@@ -3,7 +3,6 @@ from langgraph.graph import END, StateGraph
 
 from app.graph.models import Entity
 from app.graph.state import GraphState
-from app.graph.nodes.cleaning import Cleaner
 from app.graph.nodes.morphology import MorphAnalyzer
 from app.graph.nodes.ner import NER
 from app.graph.nodes.srl import SRL
@@ -11,13 +10,11 @@ from app.graph.nodes.fpdf import FPDF
 
 class GraphRunner:
     def __init__(self):
-        self._cleaner = Cleaner()
         self._morph_analyzer = MorphAnalyzer()
         self._ner = NER()
         self._srl = SRL()
         self._fpdf = FPDF()
         self._graph = self._compile_graph(
-            self._cleaner,
             self._morph_analyzer,
             self._ner,
             self._srl,
@@ -26,22 +23,17 @@ class GraphRunner:
 
     def _compile_graph(
         self,
-        cleaner: Cleaner,
         morph_analyzer: MorphAnalyzer,
         ner: NER,
         srl: SRL,
         fpdf: FPDF,
     ):
-        """cleaning ~ fpdf 노드를 잇는 LangGraph 워크플로우를 빌드하고 컴파일한다."""
-
-        def cleaning_node(state: GraphState) -> dict:
-            cleaned = cleaner.clean(state["article"])
-            return {"article": cleaned}
+        """chunking ~ fpdf 노드를 잇는 LangGraph 워크플로우를 빌드하고 컴파일한다."""
 
         def chunking_node(state: GraphState) -> dict:
             """
             [Chunking Node]
-            Cleaner에서 NER을 수행하기 전에, kiwi로 문단을 문장 단위로 분할해 청크를 생성한다.
+            NER을 수행하기 전에, kiwi로 문단을 문장 단위로 분할해 청크를 생성한다.
             kiwi의 문장 분리는 내부적으로 형태소 분석을 수반하므로, 이 결과(tokens 포함)를
             morphology 노드가 그대로 재사용해 형태소 분석이 중복 수행되지 않도록 한다.
             """
@@ -82,7 +74,6 @@ class GraphRunner:
 
         workflow = StateGraph(GraphState)
 
-        workflow.add_node("cleaning", cleaning_node)
         workflow.add_node("chunking", chunking_node)
         workflow.add_node("morphology", morphology_node)
         workflow.add_node("ner", ner_node)
@@ -90,9 +81,7 @@ class GraphRunner:
         workflow.add_node("srl", srl_node)
         workflow.add_node("fpdf", fpdf_node)
 
-        workflow.set_entry_point("cleaning")
-
-        workflow.add_edge("cleaning", "chunking")
+        workflow.set_entry_point("chunking")
 
         # FAN-OUT: chunking에서 분리된 문장들을 ner(배치 추론)과 morphology가 공유해 사용
         workflow.add_edge("chunking", "ner")
