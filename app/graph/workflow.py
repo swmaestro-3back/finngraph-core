@@ -1,6 +1,5 @@
 from kiwipiepy import Sentence
 from langgraph.graph import END, StateGraph
-from langgraph.types import Send
 
 from app.graph.models import Entity
 from app.graph.state import GraphState
@@ -49,19 +48,16 @@ class GraphRunner:
             sentences : list[Sentence] = morph_analyzer.split_sentences(state["article"])
             return {"sentences": sentences}
 
-        def route_to_ner(state: GraphState):
-            # 문장 개수만큼 NER 노드를 동적으로 병렬 실행하도록 Send 객체를 반환한다
-            return [Send("ner", {"chunk_text": sent.text}) for sent in state["sentences"]]
-
         def morphology_node(state: GraphState) -> dict:
             verb_lemmas = morph_analyzer.analyze(state["sentences"])
             return {"verb_lemmas": verb_lemmas}
 
         def ner_node(state: GraphState) -> dict:
-            # Send로 전달받은 청크 하나에 대해서만 NER을 돌린다. 여러 ner 노드 인스턴스가
-            # 동시에 실행되므로 결과는 ner_chunks 리듀서 채널에 리스트로 이어붙인다.
-            entities = ner.extract_entities(state["chunk_text"])
-            return {"ner_chunks": [entities]}
+            # 문장별로 fan-out 하는 대신, 문장 리스트 전체를 배치로 묶어 한 번에 추론한다.
+            entities_per_sentence = ner.extract_entities_batch(
+                [sent.text for sent in state["sentences"]]
+            )
+            return {"ner_chunks": entities_per_sentence}
 
         def merge_ner_node(state: GraphState) -> dict:
             # 청크 경계에 걸쳐 중복 추출된 (text, label)을 제거하며 하나의 리스트로 합친다
@@ -98,11 +94,10 @@ class GraphRunner:
 
         workflow.add_edge("cleaning", "chunking")
 
-        # FAN-OUT: chunking에서 분리된 문장들을 NER(Send 기반 동적 라우팅)과 morphology가 공유해 사용
-        workflow.add_conditional_edges("chunking", route_to_ner, ["ner"])
+        # FAN-OUT: chunking에서 분리된 문장들을 ner(배치 추론)과 morphology가 공유해 사용
+        workflow.add_edge("chunking", "ner")
         workflow.add_edge("chunking", "morphology")
 
-        # 병렬 실행된 ner 인스턴스가 모두 끝나야 merge_ner로 진입 (fan-in)
         workflow.add_edge("ner", "merge_ner")
 
         # FAN-IN: morphology와 merge_ner 노드가 모두 완료되어야 SRL 노드로 진입 가능
