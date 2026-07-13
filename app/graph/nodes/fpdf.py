@@ -44,14 +44,14 @@ class FPDF:
         subject_label = _normalize_label(frame.subject.label)
         object_label = _normalize_label(frame.object.label)
 
-        # 조건 4: subject(행위자) 개체명 타입이 술어의 arg0 목록에 없으면 제거.
-        # arg0가 빈 리스트면 타입 제약이 없는 술어이므로 통과시킨다.
-        agent_types = entry.get("arg0", [])
+        # 조건 4: subject(행위자) 개체명 타입이 술어의 subject 목록에 없으면 제거.
+        # 목록이 빈 리스트면 타입 제약이 없는 술어이므로 통과시킨다.
+        agent_types = entry.get("subject", [])
         if agent_types and subject_label is not None and subject_label not in agent_types:
             return None
 
-        # 조건 4: object(피행위자) 개체명 타입이 술어의 arg1 목록에 없으면 제거 (위와 동일한 규칙)
-        theme_types = entry.get("arg1", [])
+        # 조건 4: object(피행위자) 개체명 타입이 술어의 object 목록에 없으면 제거 (위와 동일한 규칙)
+        theme_types = entry.get("object", [])
         if theme_types and object_label is not None and object_label not in theme_types:
             return None
 
