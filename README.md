@@ -44,7 +44,6 @@ finngraph-ai/
 │       ├── state.py               # GraphState
 │       ├── models.py              # pydantic models
 │       ├── nodes/
-│       │   ├── morphology.py        # kiwipiepy sentence split + verb lemma extraction
 │       │   ├── ner.py               # named entity recognition
 │       │   ├── srl.py               # semantic role labeling (LLM)
 │       │   └── fpdf.py              # predicate-dictionary filtering

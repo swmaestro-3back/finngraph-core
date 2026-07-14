@@ -67,7 +67,7 @@ Your sole task is to extract multilateral business relationships among entities 
 0. Clause Decomposition First (clauses field): Before extracting frames, always fill the "clauses" field by decomposing the text into independent simple clauses. Coordinate arguments joined by '와/과/및/그리고' (e.g., "양극재와 음극재") must be split into one clause per entity, never treated as a single combined argument. Subordinate/causal clauses (e.g., "~하기 때문에", "~하여") that themselves describe a relationship must be split out as their own clause, not discarded as background context. Resolve pronouns (e.g., "이를") to their referent entity before extracting frames from that clause.
 1. Strict Triplet Structure: Every extracted frame must contain exactly three elements: "subject", "predicate", and "object". Never extract any additional arguments, modifiers, temporal information (time/date), monetary amounts, or percentage shares.
 2. Arguments Must Match NER Entities: The values of "subject" and "object" MUST exactly match the surface forms provided in the "NER Results (entities)" list below. Never use terms (e.g., general nouns, abstract concepts, or unrecognized words) that are not present in the given "entities" list. If an entity is not available in the list to fill either the subject or the object, do not extract that frame. Do not invent any values.
-3. Predicate Constraint: The "predicate" MUST be chosen strictly from the "registered_predicates" list. Do not create new verbs or relationship names. Prioritize matching verbs from the "verb_lemmas" (verbs actually appearing in the text).
+3. Predicate Constraint: The "predicate" MUST be chosen strictly from the "registered_predicates" list. Do not create new verbs or relationship names.
 4. Multiple Triplet Separation (Mandatory): If a single sentence contains multiple facts or relationships — including one frame per clause produced in step 0 — never combine them into a single frame. Extract them as independent frames and include all of them in the "frames" list.
 5. Negation Handling (is_negated): Set "is_negated" to true if the relationship involves a negative expression (e.g., "does not", "fails to", "rejects", "denied"). Otherwise, set it to false.
 6. Tense/Modality Classification (tense): Classify the temporal/modal status of the clause containing the predicate into exactly one of:
@@ -192,9 +192,6 @@ _HUMAN = """\
 **Registered predicate list**:
 {registered_predicates}
 
-**Verb lemma list**:
-{verb_lemmas}
-
 **NER results (entities)**:
 {entities}
 """
@@ -215,12 +212,7 @@ class SRL:
         self,
         text: str,
         entities: list[Entity],
-        verb_lemmas: list[str],
     ) -> list[SRLFrame]:
-        # verb_lemmas는 문서 전체에서 등장한 동사 원형의 중복 제거 리스트 (프롬프트 참고용
-        # 힌트일 뿐, LLM이 문장에 실제 등장한 동사를 우선 사용하도록 유도하는 강제 조건은 아님)
-        verb_lemmas_str = ", ".join(verb_lemmas) if verb_lemmas else "없음"
-
         entity_lines = [
             f"- {e.text} ({e.label})" for e in entities
         ]
@@ -233,7 +225,6 @@ class SRL:
         result = self._chain.invoke({
             "text": text,
             "registered_predicates": _REGISTERED_PREDICATES_STR,
-            "verb_lemmas": verb_lemmas_str,
             "entities": entities_str,
         })
 
