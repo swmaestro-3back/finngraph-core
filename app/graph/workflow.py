@@ -1,4 +1,4 @@
-from kiwipiepy import Kiwi, Sentence
+from kiwipiepy import Kiwi
 from langgraph.graph import END, StateGraph
 
 from app.graph.models import Entity
@@ -34,21 +34,16 @@ class GraphRunner:
             [Chunking Node]
             NER을 수행하기 전에, kiwi로 문단을 문장 단위로 분할해 청크를 생성한다.
             """
-            sentences: list[Sentence] = kiwi.split_into_sents(state["article"], return_tokens=False)
-            return {"sentences": sentences}
+            sentences = kiwi.split_into_sents(state["article"], return_tokens=False)
+            return {"sentences": [sent.text for sent in sentences]}
 
         def ner_node(state: GraphState) -> dict:
             # 문장별로 fan-out 하는 대신, 문장 리스트 전체를 배치로 묶어 한 번에 추론한다.
-            entities_per_sentence = ner.extract_entities_batch(
-                [sent.text for sent in state["sentences"]]
-            )
-            return {"ner_chunks": entities_per_sentence}
-
-        def merge_ner_node(state: GraphState) -> dict:
+            entities_per_sentence = ner.extract_entities_batch(state["sentences"])
             # 청크 경계에 걸쳐 중복 추출된 (text, label)을 제거하며 하나의 리스트로 합친다
             seen: set[tuple[str, str]] = set()
             merged: list[Entity] = []
-            for chunk_entities in state["ner_chunks"]:
+            for chunk_entities in entities_per_sentence:
                 for entity in chunk_entities:
                     key = (entity.text, entity.label)
                     if key in seen:
@@ -69,15 +64,13 @@ class GraphRunner:
 
         workflow.add_node("chunking", chunking_node)
         workflow.add_node("ner", ner_node)
-        workflow.add_node("merge_ner", merge_ner_node)
         workflow.add_node("srl", srl_node)
         workflow.add_node("fpdf", fpdf_node)
 
         workflow.set_entry_point("chunking")
 
         workflow.add_edge("chunking", "ner")
-        workflow.add_edge("ner", "merge_ner")
-        workflow.add_edge("merge_ner", "srl")
+        workflow.add_edge("ner", "srl")
         workflow.add_edge("srl", "fpdf")
         workflow.add_edge("fpdf", END)
 
