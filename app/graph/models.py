@@ -40,6 +40,12 @@ class SRLFrame(BaseModel):
     tense: TenseLabel = Field(
         description="Temporal/modal status of the relationship: past_or_present_fact, future_or_planned, or modal_possibility."
     )
+    # 이 프레임의 근거가 된 원문 문장 (provenance). LLM이 원문에 없는 문장을 근거로 지어낸
+    # 경우(공백 정규화 후 substring 검증 실패) None으로 남는다 — 프레임 자체는 유지한다.
+    source_sentence: str | None = Field(
+        default=None,
+        description="The verbatim sentence from the source text that expresses this relationship, if verified.",
+    )
 
 # FPDF
 class Triple(BaseModel):

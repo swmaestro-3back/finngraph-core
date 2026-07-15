@@ -4,9 +4,6 @@ KPF/KPF-bert-ner 모델의 레이블 상수 및 파이프라인 레이블 매핑
 출처: https://github.com/KPF-bigkinds/BIGKINDS-LAB/blob/main/KPF-BERT-NER/label.py
 """
 
-# 이거 폴더링 따로 하고 LABELS는 docs로 옮기고 실제로 필요한 KPF_TO_PIPELINE은 @lru_cache해놓는게 좋을듯
-# 그리고 이건 NER 쪽으로 옮기는게 좋아보임. utils에 놓는게 아니라
-
 # BIO 표기법 레이블 목록 (150 B- + 149 I- + 1 O = 300개)
 LABELS: list[str] = [
     'B-AFA_ART_CRAFT', 'B-AFA_DOCUMENT', 'B-AFA_MUSIC', 'B-AFA_PERFORMANCE', 'B-AFA_VIDEO',
@@ -67,60 +64,6 @@ LABELS: list[str] = [
 ]
 
 ID2LABEL: dict[int, str] = {i: label for i, label in enumerate(LABELS)}
-
-# KPF NER 클래스 한국어 설명
-NER_CODE: dict[str, str] = {
-    'PS_NAME': '인물', 'PS_CHARACTER': '캐릭터', 'PS_PET': '반려동물',
-    'FD_SCIENCE': '과학', 'FD_SOCIAL_SCIENCE': '사회과학', 'FD_MEDICINE': '의학',
-    'FD_ART': '예술', 'FD_HUMANITIES': '인문학', 'FD_OTHERS': '기타',
-    'TR_SCIENCE': '과학', 'TR_SOCIAL_SCIENCE': '사회과학', 'TR_MEDICINE': '의학',
-    'TR_ART': '예술', 'TR_HUMANITIES': '인문학', 'TR_OTHERS': '기타',
-    'AF_BUILDING': '건물', 'AF_CULTURAL_ASSET': '문화재', 'AF_ROAD': '도로/철도',
-    'AF_TRANSPORT': '교통수단', 'AF_MUSICAL_INSTRUMENT': '악기', 'AF_WEAPON': '무기',
-    'OGG_ECONOMY': '경제기관', 'OGG_EDUCATION': '교육기관', 'OGG_MILITARY': '군사기관',
-    'OGG_MEDIA': '미디어/방송', 'OGG_SPORTS': '스포츠기관', 'OGG_ART': '예술기관',
-    'OGG_MEDICINE': '의료기관', 'OGG_RELIGION': '종교기관', 'OGG_SCIENCE': '과학기관',
-    'OGG_LIBRARY': '도서관', 'OGG_LAW': '법률기관', 'OGG_POLITICS': '정부/행정',
-    'OGG_FOOD': '음식기관', 'OGG_HOTEL': '호텔', 'OGG_OTHERS': '기타기관',
-    'LCP_COUNTRY': '국가', 'LCP_PROVINCE': '도/주', 'LCP_COUNTY': '군/면/동',
-    'LCP_CITY': '도시', 'LCP_CAPITALCITY': '수도',
-    'LCG_RIVER': '강/호수', 'LCG_OCEAN': '바다', 'LCG_BAY': '반도/만',
-    'LCG_MOUNTAIN': '산', 'LCG_ISLAND': '섬', 'LCG_CONTINENT': '대륙',
-    'LC_SPACE': '천체', 'LC_OTHERS': '기타장소',
-    'CV_CULTURE': '문명/혁명', 'CV_TRIBE': '민족/종족', 'CV_LANGUAGE': '언어',
-    'CV_POLICY': '제도/정책', 'CV_LAW': '법률', 'CV_CURRENCY': '통화',
-    'CV_TAX': '조세', 'CV_FUNDS': '연금/기금', 'CV_ART': '예술분류',
-    'CV_SPORTS': '스포츠', 'CV_SPORTS_POSITION': '스포츠포지션', 'CV_SPORTS_INST': '스포츠용품',
-    'CV_PRIZE': '상/훈장', 'CV_RELATION': '가족관계', 'CV_OCCUPATION': '직업',
-    'CV_POSITION': '직위/직책', 'CV_FOOD': '음식/식재료', 'CV_DRINK': '음료/술',
-    'CV_FOOD_STYLE': '음식유형', 'CV_CLOTHING': '의복/섬유', 'CV_BUILDING_TYPE': '건축양식',
-    'DT_DURATION': '기간', 'DT_DAY': '날짜', 'DT_WEEK': '주', 'DT_MONTH': '달',
-    'DT_YEAR': '년', 'DT_SEASON': '계절', 'DT_GEOAGE': '지질시대', 'DT_DYNASTY': '왕조', 'DT_OTHERS': '기타날짜',
-    'TI_DURATION': '기간', 'TI_HOUR': '시각', 'TI_MINUTE': '분', 'TI_SECOND': '초', 'TI_OTHERS': '기타시간',
-    'QT_AGE': '나이', 'QT_SIZE': '면적', 'QT_LENGTH': '길이', 'QT_COUNT': '수량',
-    'QT_MAN_COUNT': '인원', 'QT_WEIGHT': '무게', 'QT_PERCENTAGE': '비율',
-    'QT_SPEED': '속도', 'QT_TEMPERATURE': '온도', 'QT_VOLUME': '부피',
-    'QT_ORDER': '순서', 'QT_PRICE': '금액', 'QT_PHONE': '전화번호',
-    'QT_SPORTS': '스포츠수량', 'QT_CHANNEL': '미디어채널', 'QT_ALBUM': '앨범수량',
-    'QT_ADDRESS': '주소숫자', 'QT_OTHERS': '기타수량',
-    'EV_ACTIVITY': '사회운동/선언', 'EV_WAR_REVOLUTION': '전쟁/혁명',
-    'EV_SPORTS': '스포츠행사', 'EV_FESTIVAL': '축제/행사', 'EV_OTHERS': '기타이벤트',
-    'AM_INSECT': '곤충', 'AM_BIRD': '조류', 'AM_FISH': '어류', 'AM_MAMMALIA': '포유류',
-    'AM_AMPHIBIA': '양서류', 'AM_REPTILIA': '파충류', 'AM_TYPE': '동물분류',
-    'AM_PART': '동물부위', 'AM_OTHERS': '기타동물',
-    'PT_FRUIT': '과일', 'PT_FLOWER': '꽃', 'PT_TREE': '나무', 'PT_GRASS': '풀',
-    'PT_TYPE': '식물분류', 'PT_PART': '식물부위', 'PT_OTHERS': '기타식물',
-    'MT_ELEMENT': '원소', 'MT_METAL': '금속', 'MT_ROCK': '암석', 'MT_CHEMICAL': '화학물질',
-    'TM_COLOR': '색깔', 'TM_DIRECTION': '방향', 'TM_CLIMATE': '기후',
-    'TM_SHAPE': '모양', 'TM_CELL_TISSUE_ORGAN': '세포/조직/기관',
-    'TMM_DISEASE': '질병', 'TMM_DRUG': '약',
-    'TMI_HW': '하드웨어', 'TMI_SW': '소프트웨어', 'TMI_SITE': 'URL',
-    'TMI_EMAIL': '이메일', 'TMI_MODEL': '모델명', 'TMI_SERVICE': 'IT서비스',
-    'TMI_PROJECT': '프로젝트', 'TMIG_GENRE': '게임장르', 'TM_SPORTS': '스포츠기술',
-    'AFA_ART_CRAFT': '공예품', 'AFA_DOCUMENT': '문서', 'AFA_MUSIC': '음악작품',
-    'AFA_PERFORMANCE': '공연작품', 'AFA_VIDEO': '영상작품',
-    'AFW_OTHER_PRODUCTS': '기타상품', 'AFW_SERVICE_PRODUCTS': '서비스상품',
-}
 
 # KPF fine-grained 레이블 → 파이프라인 coarse 레이블 매핑
 # None: 파이프라인 태그셋에 대응 없음 (동물/식물/인물 등 스코프 밖 카테고리)
