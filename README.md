@@ -25,39 +25,39 @@ The repository has two parts:
 finngraph-ai/
 ├── app/
 │   ├── main.py
-│   ├── models.py                # domain models (placeholder)
-│   ├── schemas.py                # FastAPI request/response DTOs
-│   ├── crud.py                   # Neo4j read queries backing the API routes
+│   ├── models.py                    # domain models (placeholder)
+│   ├── schemas.py                   # FastAPI request/response DTOs
+│   ├── crud.py                      # Neo4j read queries backing the API routes
 │   ├── api/
-│   │   ├── main.py                # FastAPI app + router registration
+│   │   ├── main.py                    # FastAPI app + router registration
 │   │   └── routes/
 │   │       ├── company.py
 │   │       ├── themes.py
-│   │       └── news.py
+│   │       └── news.py                # WIP, not yet registered on the router
 │   ├── core/
-│   │   ├── config.py              # pydantic-settings Settings, loaded from .env
-│   │   ├── db.py                  # Neo4j async driver wrapper
-│   │   ├── llm.py                 # returns ChatOpenAI or ChatGoogleGenerativeAI
-│   │   └── exceptions.py          # Global exception handling
+│   │   ├── config.py                  # pydantic-settings Settings, loaded from .env
+│   │   ├── db.py                      # Neo4j async driver wrapper
+│   │   ├── llm.py                     # returns ChatOpenAI or ChatGoogleGenerativeAI
+│   │   └── exceptions.py              # global exception handling
 │   └── graph/
-│       ├── workflow.py            # LangGraph Runner
-│       ├── state.py               # GraphState
-│       ├── models.py              # pydantic models
+│       ├── workflow.py                # LangGraph Runner
+│       ├── state.py                   # GraphState
+│       ├── models.py                  # pydantic models (Entity, SRLFrame, Triple, ...)
 │       ├── nodes/
-│       │   ├── ner.py               # named entity recognition
-│       │   ├── srl.py               # semantic role labeling (LLM)
-│       │   └── fpdf.py              # predicate-dictionary filtering
+│       │   ├── ner.py                   # named entity recognition (KPF-BERT-NER)
+│       │   ├── srl.py                   # semantic role labeling (LLM)
+│       │   └── fpdf.py                  # predicate-dictionary filtering
+│       ├── ontology/
+│       │   ├── predicate_dict.py        # binary predicate whitelist
+│       │   └── predicate_dict_nary.py   # n-ary predicate whitelist used by fpdf
 │       └── utils/
-│           └── kpf_labels.py        # KPF label constants and tag mapping
-├── data/
-│   ├── raw/
-│   └── dictionaries/
-│       └── predicate_dict.json    # predicate whitelist used by fpdf
-├── docs/
-├── tests/                       # pytest suite
-├── test.py
-├── pyproject.toml               # dependencies (uv-managed)
-└── .env.example                 # required environment variables
+│           └── kpf_labels.py          # KPF label constants and tag mapping
+├── docs/                             # design notes and investigation write-ups
+├── tests/                            # pytest suite
+│   └── data/                          # sample article fixtures used by tests
+├── KPF-bert-ner/                     # cloned HuggingFace model (gitignored, see below)
+├── pyproject.toml                   # dependencies (uv-managed)
+└── .env.example                     # required environment variables
 ```
 
 ## How to Run
@@ -80,7 +80,7 @@ Note this requires a Neo4j instance already populated with the extracted triples
 **Run the extraction pipeline** on the sample article baked into `test.py`:
 
 ```bash
-uv run python test.py
+uv run tests/test.py
 ```
 
 This builds the LangGraph workflow, invokes it once, and prints `Graph completed successfully.` on completion.
