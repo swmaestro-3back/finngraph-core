@@ -1,11 +1,8 @@
-"""
-KPF/KPF-bert-ner 모델의 레이블 상수 및 파이프라인 레이블 매핑.
-
-출처: https://github.com/KPF-bigkinds/BIGKINDS-LAB/blob/main/KPF-BERT-NER/label.py
-"""
-
 # BIO 표기법 레이블 목록 (150 B- + 149 I- + 1 O = 300개)
-LABELS: list[str] = [
+# KPF/KPF-BERT-NER 모델의 레이블 상수 매핑
+# 모델이 정수값을 뱉고 정수값은 아래의 라벨 데이터들의 인덱스와 매핑되는 구조라 필수적으로 참고해야하는 데이터
+# 출처: https://github.com/KPF-bigkinds/BIGKINDS-LAB/blob/main/KPF-BERT-NER/label.py
+KPF_BERT_LABELS: list[str] = [
     'B-AFA_ART_CRAFT', 'B-AFA_DOCUMENT', 'B-AFA_MUSIC', 'B-AFA_PERFORMANCE', 'B-AFA_VIDEO',
     'B-AFW_OTHER_PRODUCTS', 'B-AFW_SERVICE_PRODUCTS',
     'B-AF_BUILDING', 'B-AF_CULTURAL_ASSET', 'B-AF_MUSICAL_INSTRUMENT', 'B-AF_ROAD', 'B-AF_TRANSPORT', 'B-AF_WEAPON',
@@ -63,14 +60,10 @@ LABELS: list[str] = [
     'O',
 ]
 
-ID2LABEL: dict[int, str] = {i: label for i, label in enumerate(LABELS)}
+ID2KPF: dict[int, str] = {i: label for i, label in enumerate(KPF_BERT_LABELS)}
 
-# KPF fine-grained 레이블 → 파이프라인 coarse 레이블 매핑
-# None: 파이프라인 태그셋에 대응 없음 (동물/식물/인물 등 스코프 밖 카테고리)
-KPF_TO_PIPELINE: dict[str, str | None] = {
-    # COMPANY: 경제기관(기업·은행·증권사 등)만 인정. OGG_ECONOMY는 KPF 상 세분류가
-    # 없어 증권/금융업으로만 한정하지는 못하고 제조업 등 모든 경제 주체를 포함하지만,
-    # 증권 도메인 기업은 전부 이 안에 포함되는 상위집합이다.
+KPF2FINNGRAPH: dict[str, str | None] = {
+    # COMPANY: 경제기관(기업·은행·증권사 등)
     'OGG_ECONOMY':    'COMPANY',
 
     # GOVERNMENT: 국가 행정·공권력 기관
@@ -94,10 +87,9 @@ KPF_TO_PIPELINE: dict[str, str | None] = {
     'TMI_PROJECT':        'PRODUCT',
 }
 
-
-def kpf_to_pipeline(kpf_label: str) -> str | None:
-    """KPF fine-grained 레이블을 파이프라인 EntityLabel로 변환한다.
-
-    매핑 없는 레이블(동물, 식물 등)은 None 반환.
+def kpf_to_finngraph_label(kpf_label: str) -> str | None:
     """
-    return KPF_TO_PIPELINE.get(kpf_label)
+    KPF_LABEL을 FINNGRAPH_LABEL로 변환
+    매핑 없는 레이블은 None 반환.
+    """
+    return KPF2FINNGRAPH.get(kpf_label)

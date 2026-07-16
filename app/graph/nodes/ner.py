@@ -8,7 +8,7 @@
 import torch
 from transformers import AutoTokenizer, BertForTokenClassification, logging as hf_logging
 
-from app.graph.utils.kpf_labels import ID2LABEL, kpf_to_pipeline
+from app.graph.utils.kpf_labels import ID2KPF, kpf_to_finngraph_label
 from app.graph.models import Entity
 
 # transformers 라이브러리 자체의 로그 레벨을 ERROR로 올려서,
@@ -39,7 +39,6 @@ class NER:
         return [self._to_entities(kpf_entries) for kpf_entries in batch_kpf_entries]
 
     def _to_entities(self, kpf_entries: list[dict]) -> list[Entity]:
-        seen: set[tuple[str, str]] = set()
         entities: list[Entity] = []
 
         for entry in kpf_entries:
@@ -47,10 +46,6 @@ class NER:
             # pipeline_label=None: 파이프라인 태그셋(기업 간 관계)에 대응 없는 KPF 카테고리 → 제외
             if pipeline_label is None:
                 continue
-            key = (entry["word"], pipeline_label)
-            if key in seen:
-                continue
-            seen.add(key)
             entities.append(Entity(text=entry["word"], label=pipeline_label))
 
         return entities
@@ -80,7 +75,7 @@ class NER:
         batch_tokens = [encoding.tokens for encoding in inputs.encodings]
 
         return [
-            self._merge_bio(tokens, [ID2LABEL[label_id] for label_id in preds], mask)
+            self._merge_bio(tokens, [ID2KPF[label_id] for label_id in preds], mask)
             for tokens, preds, mask in zip(batch_tokens, token_predictions, attention_mask)
         ]
 
@@ -115,7 +110,7 @@ class NER:
                 # 새 엔티티의 시작. 직전에 다른 엔티티를 누적 중이었다면
                 # (연속된 두 엔티티 사이에 O가 안 끼는 경우) 먼저 그걸 확정 저장한다.
                 if is_prev_entity:
-                    word_list.append({"word": _word, "pipeline_label": kpf_to_pipeline(prev_entity_tag)})
+                    word_list.append({"word": _word, "pipeline_label": kpf_to_finngraph_label(prev_entity_tag)})
                     _word = ""
                 _word += token
                 is_prev_entity = True
@@ -131,7 +126,7 @@ class NER:
 
             else:  # O: 엔티티가 아닌 토큰 → 누적 중이던 엔티티를 확정 저장하고 리셋
                 if is_prev_entity:
-                    word_list.append({"word": _word, "pipeline_label": kpf_to_pipeline(prev_entity_tag)})
+                    word_list.append({"word": _word, "pipeline_label": kpf_to_finngraph_label(prev_entity_tag)})
                     _word = ""
                     is_prev_entity = False
                     is_there_B_before_I = False
@@ -139,6 +134,6 @@ class NER:
         # 청크가 O 없이 엔티티 도중(B-/I-)에 끝나는 경우, 위 루프에선 저장되지
         # 않으므로 [SEP] 직전까지 이어진 마지막 엔티티를 여기서 한 번 더 저장한다.
         if is_prev_entity and _word:
-            word_list.append({"word": _word, "pipeline_label": kpf_to_pipeline(prev_entity_tag)})
+            word_list.append({"word": _word, "pipeline_label": kpf_to_finngraph_label(prev_entity_tag)})
 
         return word_list
