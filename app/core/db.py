@@ -1,5 +1,7 @@
-from neo4j import AsyncGraphDatabase
-from typing import LiteralString
+from typing import LiteralString, Optional
+
+from neo4j import AsyncGraphDatabase, Record
+
 from app.core.config import settings
 
 # Driver
@@ -23,7 +25,7 @@ class Neo4jDatabase:
         try:
             self._driver = AsyncGraphDatabase.driver(
                 settings.NEO4J_URI,
-                auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD)
+                auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD)
             )
         except Exception as e:
             print(f"Error occurred while initializing Neo4j driver: {e}")
