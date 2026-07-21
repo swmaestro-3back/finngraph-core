@@ -17,6 +17,31 @@ def _load(filename: str) -> list[dict]:
         return json.load(f)
 
 
+# UNIQUE CONSTRAINT 생성
+# Neo4j에는 PK라는 개념이 없고 이런 속성이 자동으로 부여되지 않는다.
+# ENTITY 나 RELATION의 ID는 Neo4j가 자동으로 부여하는 고유한 값으로 내 맘대로 지정할 수 없다.
+# 따라서 PK 처럼 동작할 필드를 지정해주어야 한다.
+# 이를 UNIQUE CONSTRAINTS를 통해 구현한다.
+# UNIQUE CONSTRAINTS를 걸면 자동으로 B-TREE를 생성해준다.
+async def create_constraints() -> None:
+    # COMPANY TICKER
+    await neo4j_database.execute(
+        """
+        CREATE CONSTRAINT company_ticker_unique IF NOT EXISTS
+        FOR (c:Company) REQUIRE c.ticker IS UNIQUE
+        """
+    )
+
+    # COUNTRY ISO_NUM
+    await neo4j_database.execute(
+        """
+        CREATE CONSTRAINT country_iso_num_unique IF NOT EXISTS
+        FOR (c:Country) REQUIRE c.iso_num IS UNIQUE
+        """
+    )
+    print("Constraints created")
+
+
 async def seed_countries() -> None:
     rows = [
         {
@@ -31,8 +56,8 @@ async def seed_countries() -> None:
     await neo4j_database.execute(
         """
         UNWIND $rows AS row
-        MERGE (c:Country {iso_alp2: row.iso_alp2})
-        SET c.name = row.name, c.iso_num = row.iso_num
+        MERGE (c:Country {iso_num: row.iso_num})
+        SET c.name = row.name, c.iso_alp2 = row.iso_alp2
         """,
         {"rows": rows},
     )
@@ -84,6 +109,10 @@ async def seed_us_companies() -> None:
 
 async def main() -> None:
     await neo4j_database.init_driver()
+
+    # 실제 SEED DATA가 들어오기 전에 UNIQUE CONSTRAINTS를 설정해줄 수 있다.
+    await create_constraints()
+
     await seed_countries()
     await seed_krx_companies()
     await seed_us_companies()
