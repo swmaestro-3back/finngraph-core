@@ -14,7 +14,7 @@ from app.schemas import (
 
 def _node_identity(node) -> tuple[str, NodeType, str]:
     if "Company" in node.labels:
-        return node["srtnCd"], "COMPANY", node["name"]
+        return node["ticker"], "COMPANY", node["name"]
     return str(node["theme_id"]), "THEME", node["name"]
 
 
@@ -24,7 +24,7 @@ async def get_company_network(
     """companyId를 기준으로 BELONGS_TO 관계를 hops만큼 양방향 탐색해 서브그래프를 반환한다."""
     async with neo4j_database.get_session() as session:
         source_result = await session.run(
-            "MATCH (c:Company {srtnCd: $companyId}) RETURN c.srtnCd AS id, c.name AS name",
+            "MATCH (c:Company {ticker: $companyId}) RETURN c.ticker AS id, c.name AS name",
             companyId=company_id,
         )
         source_record = await source_result.single()
@@ -35,7 +35,7 @@ async def get_company_network(
         # 이미 검증된 int인 hops를 쿼리 문자열에 직접 삽입한다.
         path_result = await session.run(
             f"""
-            MATCH (source:Company {{srtnCd: $companyId}})
+            MATCH (source:Company {{ticker: $companyId}})
             MATCH path = (source)-[:BELONGS_TO*1..{hops}]-(other)
             WHERE other <> source
             RETURN path
@@ -89,7 +89,7 @@ async def get_theme_companies(theme_id: int, top: int) -> ThemeCompaniesResponse
         companies_result = await session.run(
             """
             MATCH (:Theme {theme_id: $themeId})<-[:BELONGS_TO]-(c:Company)
-            RETURN c.srtnCd AS id, c.name AS name, c.market AS market, c.mrkTotAmt AS mrkTotAmt
+            RETURN c.ticker AS id, c.name AS name, c.market AS market, c.mrkTotAmt AS mrkTotAmt
             ORDER BY c.mrkTotAmt DESC
             LIMIT $top
             """,
