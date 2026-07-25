@@ -1,5 +1,5 @@
 from app.graph.models import SRLFrame, Triple
-from app.graph.ontology.predicate_dict_nary import PREDICATE_DICT_NARY
+from app.graph.ontology.predicate_dict import PREDICATE_DICT
 
 def _normalize_label(label: str | None) -> str | None:
     """LLM이 None 대신 문자열 "null"/"none"을 반환하는 경우를 정규화한다."""
@@ -9,7 +9,7 @@ def _normalize_label(label: str | None) -> str | None:
 
 class FPDF:
     def __init__(self):
-        self._predicate_dict: dict = PREDICATE_DICT_NARY
+        self._predicate_dict: dict = PREDICATE_DICT
 
     def filter(self, srl_output: list[SRLFrame]) -> list[Triple]:
         triples: list[Triple] = []

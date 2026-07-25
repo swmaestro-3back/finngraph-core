@@ -8,7 +8,7 @@
 import torch
 from transformers import AutoTokenizer, BertForTokenClassification, logging as hf_logging
 
-from app.graph.utils.kpf_labels import ID2KPF, kpf_to_finngraph_label
+from app.graph.utils.kpf import ID2KPF, kpf_to_finngraph_label
 from app.graph.models import Entity
 
 # transformers 라이브러리 자체의 로그 레벨을 ERROR로 올려서,

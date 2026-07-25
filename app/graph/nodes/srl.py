@@ -11,7 +11,7 @@ from app.graph.models import (
     SRLFrame,
     TenseLabel,
 )
-from app.graph.ontology.predicate_dict_nary import PREDICATE_DICT_NARY
+from app.graph.ontology.predicate_dict import PREDICATE_DICT
 
 # LLM이 NER 결과와 무관하게 subject/object/item에 라벨을 지어낼 수 있으므로
 # 할루시네이션을 방지용 모델 생성
@@ -60,7 +60,7 @@ class _RawSRLOutput(BaseModel):
         )
     )
 
-_PREDICATE_DICT: dict = PREDICATE_DICT_NARY
+_PREDICATE_DICT: dict = PREDICATE_DICT
 _REGISTERED_PREDICATES: set[str] = set(_PREDICATE_DICT.keys())
 
 # 술어 이름만 나열하지 않고 description과 argument(역할)별 설명을 함께 조립해 프롬프트에

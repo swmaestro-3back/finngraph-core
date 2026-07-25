@@ -2,7 +2,7 @@ from kiwipiepy import Kiwi
 from langgraph.graph import END, StateGraph
 
 from app.graph.state import GraphState
-from app.graph.utils.entities import dedupe_entities
+from app.graph.models import Entity
 from app.graph.nodes.ner import NER
 from app.graph.nodes.srl import SRL
 from app.graph.nodes.fpdf import FPDF
@@ -40,9 +40,17 @@ class GraphRunner:
         def ner_node(state: GraphState) -> dict:
             # 문장별로 fan-out 하는 대신, 문장 리스트 전체를 배치로 묶어 한 번에 추론한다.
             entities_per_sentence = ner.extract_entities_batch(state["sentences"])
-            # 청크 경계에 걸쳐 중복 추출된 (text, label)을 제거하며 하나의 리스트로 합친다
-            flattened = [entity for chunk_entities in entities_per_sentence for entity in chunk_entities]
-            return {"ner": dedupe_entities(flattened)}
+            # 청크 경계에 걸쳐 중복 추출된 (text, label)을 앞에서 나온 순서대로 하나만 남긴다.
+            seen: set[tuple[str, str]] = set()
+            deduped: list[Entity] = []
+            for chunk_entities in entities_per_sentence:
+                for entity in chunk_entities:
+                    key = (entity.text, entity.label)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    deduped.append(entity)
+            return {"ner": deduped}
 
         def srl_node(state: GraphState) -> dict:
             srl_output = srl.label(state["article"], state["ner"])
