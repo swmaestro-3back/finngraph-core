@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "datasets>=5.0.0",
     "fastapi[standard]>=0.139.0",
+    "flashtext>=2.7",
     "google-generativeai>=0.8.6",
     "kiwipiepy>=0.23.2",
     "kss>=6.0.6",

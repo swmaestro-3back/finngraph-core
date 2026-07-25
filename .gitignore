@@ -66,6 +66,9 @@ wiki/
 # Data
 data/
 
+# Ontology
+ontology/
+
 # Tests
 tests/
 test.json
