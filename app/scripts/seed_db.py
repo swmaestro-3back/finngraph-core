@@ -1,16 +1,14 @@
 """data/seed의 country.json, krx.json, us.json을 읽어 docs/neo4j_schema.md 스키마에 맞게 Neo4j에 적재한다.
 
-실행: python -m app.scripts.seed_db
+seed()를 진입점으로 노출하며, app.main의 seed_if_empty()가 DB가 비어있을 때 호출한다.
 """
 
-import asyncio
 import json
 from pathlib import Path
 
 from app.core.db import neo4j_database
 
 SEED_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "seed"
-
 
 def _load(filename: str) -> list[dict]:
     with open(SEED_DIR / filename, encoding="utf-8") as f:
@@ -107,16 +105,19 @@ async def seed_us_companies() -> None:
         print(f"Company:{label}: {len(rows)} nodes merged")
 
 
-async def main() -> None:
+async def seed():
     await neo4j_database.init_driver()
 
+    # seed가 이미 존재한다면 스킵
+    records = await neo4j_database.execute("MATCH (n) RETURN count(n) AS c")
+    node_count = records[0]["c"]
+    if node_count > 0:
+        print(f"Skip seeding: {node_count} nodes already exist")
+        return
+    
     # 실제 SEED DATA가 들어오기 전에 UNIQUE CONSTRAINTS를 설정해줄 수 있다.
     await create_constraints()
 
     await seed_countries()
     await seed_krx_companies()
     await seed_us_companies()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
