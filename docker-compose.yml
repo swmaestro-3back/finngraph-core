@@ -1,0 +1,32 @@
+# Neo4j만 Docker로 띄우고, 앱(app.core.db)은 호스트에서 실행되어
+# bolt://localhost:7687 로 이 컨테이너에 접속하는 구조다.
+# 실행: docker compose up -d   /   종료: docker compose down
+#
+# 인증/DB 이름은 앱과 동일한 .env를 그대로 읽어 값을 맞춘다(변수 치환).
+# 주의: Community Edition은 기본 DB(neo4j) 하나만 지원하므로 NEO4J_DATABASE=neo4j 로 둘 것.
+#       (커스텀 DB 이름은 Enterprise 전용)
+services:
+  neo4j:
+    container_name: finngraph-neo4j
+    # 최신 LTS 버전을 위해 버전 명시 X
+    image: neo4j
+    # port mapping
+    ports:
+      - "7474:7474"   # HTTP Neo4j Browser (http://localhost:7474)
+      - "7687:7687"   # Bolt Driver (app.core.db)
+    environment:
+      # community version은 username이 neo4j로 고정됨
+      NEO4J_AUTH: "${NEO4J_USERNAME}/${NEO4J_PASSWORD}"
+      NEO4J_initial_dbms_default__database: "finngraph"
+    volumes:
+      # Bind Mount 방식으로 진행
+      # 로컬 프로젝트에 데이터 마운트
+      - ./neo4j_data:/data
+      - ./neo4j_logs:/logs
+    healthcheck:
+      # 시작 전 healthcheck
+      test: ["CMD-SHELL", "cypher-shell -u ${NEO4J_USERNAME} -p '${NEO4J_PASSWORD}' 'RETURN 1' || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
