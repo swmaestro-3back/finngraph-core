@@ -22,7 +22,7 @@ PREDICATE_DICT: dict = {
     },
     # 투자하다
     "INVESTS_IN": {
-        "description": "Subject invests capital into the object.",
+        "description": "Subject makes a simple capital/equity investment into the object (a minority stake), without taking ownership or control. If the subject obtains ownership or control, use ACQUIRES instead.",
         "arguments": {
             "investor": {
                 "types": [
@@ -39,26 +39,6 @@ PREDICATE_DICT: dict = {
                     "COUNTRY"
                 ],
                 "description": "Investment recipient",
-                "required": True
-            }
-        }
-    },
-    # 분할하다
-    "SPLITS_OFF": {
-        "description": "Subject splits off the object as a separate company.",
-        "arguments": {
-            "splitting_company": {
-                "types": [
-                    "COMPANY"
-                ],
-                "description": "Splitting company",
-                "required": True
-            },
-            "company_split_off": {
-                "types": [
-                    "COMPANY"
-                ],
-                "description": "Company split off",
                 "required": True
             }
         }
@@ -87,39 +67,9 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 수주하다.
-    "WINS_CONTRACT_FROM": {
-        "description": "Subject wins a bid, tender, or order awarded by the object client. Extracted as a single event.",
-        "arguments": {
-            "winner": {
-                "types": [
-                    "COMPANY"
-                ],
-                "description": "Company that wins the contract",
-                "required": True
-            },
-            "client": {
-                "types": [
-                    "COMPANY",
-                    "GOVERNMENT",
-                    "COUNTRY"
-                ],
-                "description": "Client or bid-awarding entity",
-                "required": True
-            },
-            "item": {
-                "types": [
-                    "PRODUCT",
-                    "COMMODITY"
-                ],
-                "description": "Ordered product or commodity",
-                "required": False
-            }
-        }
-    },
-    # 인수하다
+    # 인수하다 (합병·자회사 편입 포함)
     "ACQUIRES": {
-        "description": "Subject obtains ownership of the object company.",
+        "description": "Subject obtains ownership or control of the object company. This also covers a merger (합병) in which the subject absorbs the object, and the object becoming the subject's subsidiary or affiliate (자회사·계열사 편입) as a result of the deal. For a minority investment without control, use INVESTS_IN instead.",
         "arguments": {
             "acquirer": {
                 "types": [
@@ -138,9 +88,9 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 공급하다
+    # 공급하다 (공급계약 체결·수주 포함)
     "SUPPLIES_TO": {
-        "description": "Supplier supplies an item to a recipient.",
+        "description": "Supplier supplies or delivers an item to a recipient. This also covers signing a supply contract or winning a supply order/bid (수주) to provide the item — treat those as SUPPLIES_TO as well.",
         "arguments": {
             "supplier": {
                 "types": [
@@ -170,7 +120,7 @@ PREDICATE_DICT: dict = {
     },
     # 수출하다
     "EXPORTS_TO": {
-        "description": "Exporter exports an item to an importing party abroad. Extracted as a single event.",
+        "description": "Exporter exports an item to an importing party abroad. Extracted as a single event. If a sentence describes importing (A imports X from B), restate it in this direction (B exports X to A) instead of a separate import predicate.",
         "arguments": {
             "exporter": {
                 "types": [
@@ -198,35 +148,6 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 수입하다
-    "IMPORTS_FROM": {
-        "description": "Importer imports an item from a supplying party abroad. Extracted as a single event.",
-        "arguments": {
-            "importer": {
-                "types": [
-                    "COMPANY",
-                    "COUNTRY"
-                ],
-                "description": "Importer",
-                "required": True
-            },
-            "supplying_party": {
-                "types": [
-                    "COMPANY"
-                ],
-                "description": "Supplying party",
-                "required": True
-            },
-            "item": {
-                "types": [
-                    "COMMODITY",
-                    "PRODUCT"
-                ],
-                "description": "Product or commodity imported",
-                "required": True
-            }
-        }
-    },
     # 위치하다
     "LOCATED_IN": {
         "description": "Subject is located or headquartered in the object country.",
@@ -249,7 +170,7 @@ PREDICATE_DICT: dict = {
     },
     # 생산하다
     "PRODUCES": {
-        "description": "Subject manufactures or produces the object.",
+        "description": "Subject manufactures or mass-produces the object. Use DEVELOPS for the R&D/development stage before mass production.",
         "arguments": {
             "producer": {
                 "types": [
@@ -264,6 +185,69 @@ PREDICATE_DICT: dict = {
                     "COMMODITY"
                 ],
                 "description": "Product or commodity produced",
+                "required": True
+            }
+        }
+    },
+    # 경쟁하다
+    "COMPETES_WITH": {
+        "description": "Subject competes with the object company in a product or market. Symmetric relationship. Note that two companies may both compete and cooperate in different areas, so this does not preclude PARTNERS_WITH.",
+        "arguments": {
+            "competing_company": {
+                "types": [
+                    "COMPANY"
+                ],
+                "description": "One competing company",
+                "required": True
+            },
+            "competitor": {
+                "types": [
+                    "COMPANY"
+                ],
+                "description": "The rival company",
+                "required": True
+            }
+        }
+    },
+    # 개발하다
+    "DEVELOPS": {
+        "description": "Subject develops or is developing the object as a product/material. Use this for the R&D or development stage (e.g. '개발 중', '개발 완료'), as distinct from actual mass production (use PRODUCES for that).",
+        "arguments": {
+            "developer": {
+                "types": [
+                    "COMPANY"
+                ],
+                "description": "Developer",
+                "required": True
+            },
+            "developed_item": {
+                "types": [
+                    "PRODUCT",
+                    "COMMODITY"
+                ],
+                "description": "Product or material being developed",
+                "required": True
+            }
+        }
+    },
+    # 제재·규제하다
+    "SANCTIONS": {
+        "description": "Subject imposes sanctions, export controls, or regulatory restrictions on the object. Typically a government or country acting against another country or a company.",
+        "arguments": {
+            "sanctioning_party": {
+                "types": [
+                    "GOVERNMENT",
+                    "COUNTRY"
+                ],
+                "description": "Party imposing the sanction or restriction",
+                "required": True
+            },
+            "sanctioned_party": {
+                "types": [
+                    "COUNTRY",
+                    "COMPANY"
+                ],
+                "description": "Party being sanctioned or restricted",
                 "required": True
             }
         }
