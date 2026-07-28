@@ -37,7 +37,7 @@ finngraph-ai/
 │   ├── core/
 │   │   ├── config.py                  # pydantic-settings Settings, loaded from .env
 │   │   ├── db.py                      # Neo4j async driver wrapper
-│   │   ├── llm.py                     # returns ChatOpenAI or ChatGoogleGenerativeAI
+│   │   ├── llm.py                     # get_llm(): Gemini(ChatGoogleGenerativeAI) 전용 팩토리
 │   │   └── exceptions.py              # global exception handling
 │   └── graph/
 │       ├── workflow.py                # LangGraph Runner
@@ -62,28 +62,45 @@ finngraph-ai/
 
 ## How to Run
 
-Requires Python 3.13+ and [uv](https://docs.astral.sh/uv/).
+Requires Python 3.13+, [uv](https://docs.astral.sh/uv/), and Docker.
 
 ```bash
 # install dependencies
 uv sync
 ```
 
-**Run the fastapi server**:
+Copy `.env.example` to `.env` and fill in every value (see [Environment Configuration](#environment-configuration) below) before running anything — both Docker Compose and the app read from `.env`.
+
+**Start Neo4j** with Docker Compose:
+
+```bash
+# start Neo4j in the background
+docker compose up -d
+
+# check status / wait for the healthcheck to pass
+docker compose ps
+
+# stop it later
+docker compose down
+```
+
+This launches a `finngraph-neo4j` container exposing the Neo4j Browser at http://localhost:7474 and the Bolt driver at `bolt://localhost:7687`. Data and logs are bind-mounted to `./neo4j_data` and `./neo4j_logs`. Credentials come from `NEO4J_USERNAME` / `NEO4J_PASSWORD` in your `.env`.
+
+**Run the extraction pipeline** (`app/main.py`):
+
+```bash
+uv run python -m app.main
+```
+
+On first run this seeds Neo4j if it's empty, then builds the LangGraph workflow, invokes it once on the sample article baked into `app/main.py`, and prints `Graph completed successfully. N triplets saved.` on completion. Requires the Neo4j container (above) to be up.
+
+**Run the FastAPI server**:
 
 ```bash
 uv run fastapi dev app/api/main.py
 ```
 
-Note this requires a Neo4j instance already populated with the extracted triples; there is currently no script that loads pipeline output into Neo4j.
-
-**Run the extraction pipeline** on the sample article baked into `test.py`:
-
-```bash
-uv run tests/test.py
-```
-
-This builds the LangGraph workflow, invokes it once, and prints `Graph completed successfully.` on completion.
+This reads the graph from Neo4j and serves the query API. Populate the graph via the extraction pipeline first.
 
 **Run tests**:
 
