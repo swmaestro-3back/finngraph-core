@@ -26,7 +26,7 @@ MODEL_PATH = "./KPF-bert-ner"
 # 통째로 추론한다. 모델의 max_position_embeddings가 512라 truncation으로 안전장치를 둔다.
 MAX_LENGTH = 512
 
-class NER:
+class EntityExtractor:
     def __init__(self):
         self._tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
         self._model = BertForTokenClassification.from_pretrained(MODEL_PATH)
