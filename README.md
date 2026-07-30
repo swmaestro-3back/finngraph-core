@@ -1,10 +1,10 @@
-# finngraph-ai
+# finngraph-core
 
-Extraction pipeline and query API for a knowledge graph of business relationships (M&A, investment, partnerships, supply contracts, etc.) mined from Korean financial and economic news.
+Triplet extraction pipeline for a knowledge graph of business relationships (M&A, investment, partnerships, supply contracts, etc.) mined from Korean financial and economic news.
 
 ## Project Overview
 
-finngraph-ai turns raw Korean news articles into structured `(subject, predicate, object)` triples describing business relationships between companies, and between companies and governments/countries — for example:
+finngraph-core turns raw Korean news articles into structured `(subject, predicate, object)` triples describing business relationships between companies, and between companies and governments/countries — for example:
 
 - `(SK Hynix, supplies, NVIDIA)` — supply contract
 - `(Samsung Electronics, acquires, Harman)` — M&A
@@ -13,45 +13,48 @@ finngraph-ai turns raw Korean news articles into structured `(subject, predicate
 
 Pure macro events such as geopolitical events (sanctions, negotiations, war) and macroeconomic indicators (interest rates, FX) are out of scope; only COMPANY-centered business relationships are extracted.
 
-The repository has two parts:
+This is not an API server — it is a [LangGraph](https://github.com/langchain-ai/langgraph) extraction pipeline (`app/graph`) that runs as a workflow of nodes:
 
-1. **Extraction pipeline** (`app/graph`) — a [LangGraph](https://github.com/langchain-ai/langgraph) workflow that extracts triplet from raw financial news articles as mentioned.
+```
+normalizer → entity_extractor → relation_extractor → triplet_builder
+```
 
-2. **API** (`app/api`) — a FastAPI service that reads the resulting graph from Neo4j and exposes endpoints such as a company's N-hop relationship network and theme-associated corporate relations.
+- **normalizer** — standardizes entity names in the article using gazetteer dictionaries
+- **entity_extractor** — extracts entities via gazetteer matching (a KPF-BERT-NER extractor also exists in `app/graph/nodes/entity_extractor.py` but is not wired into the current workflow)
+- **relation_extractor** — LLM-based relation extraction between the found entities
+- **triplet_builder** — filters relations against the predicate whitelist and assembles final `(s, p, o)` triplets
+
+The resulting triplets are persisted to Neo4j.
 
 ## Directory Structure
 
 ```
-finngraph-ai/
+finngraph-core/
 ├── app/
-│   ├── main.py
-│   ├── models.py                    # domain models (placeholder)
-│   ├── schemas.py                   # FastAPI request/response DTOs
-│   ├── crud.py                      # Neo4j read queries backing the API routes
-│   ├── api/
-│   │   ├── main.py                    # FastAPI app + router registration
-│   │   └── routes/
-│   │       ├── company.py
-│   │       ├── themes.py
-│   │       └── news.py                # WIP, not yet registered on the router
+│   ├── main.py                        # entry point: seeds Neo4j, runs the workflow once
+│   ├── crud.py                        # Neo4j write queries (triplet upsert)
 │   ├── core/
-│   │   ├── config.py                  # pydantic-settings Settings, loaded from .env
-│   │   ├── db.py                      # Neo4j async driver wrapper
-│   │   ├── llm.py                     # get_llm(): Gemini(ChatGoogleGenerativeAI) 전용 팩토리
-│   │   └── exceptions.py              # global exception handling
-│   └── graph/
-│       ├── workflow.py                # LangGraph Runner
-│       ├── state.py                   # GraphState
-│       ├── models.py                  # pydantic models (Entity, SRLFrame, Triple, ...)
-│       ├── nodes/
-│       │   ├── ner.py                   # named entity recognition (KPF-BERT-NER)
-│       │   ├── srl.py                   # semantic role labeling (LLM)
-│       │   └── fpdf.py                  # predicate-dictionary filtering
-│       ├── ontology/
-│       │   ├── predicate_dict.py        # binary predicate whitelist
-│       │   └── predicate_dict_nary.py   # n-ary predicate whitelist used by fpdf
-│       └── utils/
-│           └── kpf_labels.py          # KPF label constants and tag mapping
+│   │   ├── config.py                    # pydantic-settings Settings, loaded from .env
+│   │   ├── db.py                        # Neo4j async driver wrapper
+│   │   └── llm.py                       # get_llm(): Gemini(ChatGoogleGenerativeAI) 전용 팩토리
+│   ├── graph/
+│   │   ├── workflow.py                  # LangGraph Runner
+│   │   ├── state.py                     # GraphState
+│   │   ├── models.py                    # pydantic models (Entity, Triple, ...)
+│   │   ├── nodes/
+│   │   │   ├── gazetteer.py               # gazetteer matching: normalization + entity extraction
+│   │   │   ├── entity_extractor.py        # KPF-BERT-NER extractor (not in current workflow)
+│   │   │   ├── relation_extractor.py      # relation extraction (LLM)
+│   │   │   └── triplet_builder.py         # assembles final (s, p, o) triplets
+│   │   ├── ontology/
+│   │   │   ├── predicate_dict.py          # predicate whitelist
+│   │   │   └── gazetteers/                # entity dictionaries (KRX, US, country, commodity, product)
+│   │   ├── prompts/
+│   │   │   └── relation_extraction.py     # LLM prompt for relation extraction
+│   │   └── utils/
+│   │       └── kpf.py                     # KPF label constants and tag mapping
+│   └── scripts/
+│       └── seed_db.py                   # seeds Neo4j when empty
 ├── docs/                             # design notes and investigation write-ups
 ├── tests/                            # pytest suite
 │   └── data/                          # sample article fixtures used by tests
@@ -94,14 +97,6 @@ uv run python -m app.main
 
 On first run this seeds Neo4j if it's empty, then builds the LangGraph workflow, invokes it once on the sample article baked into `app/main.py`, and prints `Graph completed successfully. N triplets saved.` on completion. Requires the Neo4j container (above) to be up.
 
-**Run the FastAPI server**:
-
-```bash
-uv run fastapi dev app/api/main.py
-```
-
-This reads the graph from Neo4j and serves the query API. Populate the graph via the extraction pipeline first.
-
 **Run tests**:
 
 ```bash
@@ -114,11 +109,7 @@ Copy `.env.example` to `.env` and fill in every value — `Settings` in `app/cor
 
 ## Install HuggingFace Model Locally
 
-finngraph-ai uses [KPF-BERT-NER](https://huggingface.co/KPF/KPF-bert-ner) for entity recognition in the extraction pipeline.
-
-The pipeline loads `KPF/KPF-bert-ner` via `from_pretrained`, so `transformers` will download and cache it automatically on first run.
-
-If you'd rather fetch it ahead of time (e.g. for a faster first run or an offline environment), clone it manually:
+The KPF-BERT-NER extractor (`app/graph/nodes/entity_extractor.py`) loads [KPF-BERT-NER](https://huggingface.co/KPF/KPF-bert-ner) from the local `./KPF-bert-ner` directory, so the model must be cloned into the project root before using it (the current workflow uses gazetteer-based extraction instead, so this is only needed if you wire the NER extractor back in):
 
 ```bash
 # install git-xet to pull the large model files
