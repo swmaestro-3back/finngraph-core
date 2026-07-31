@@ -69,9 +69,16 @@ data/
 # Ontology
 ontology/
 
+# Prompts
+prompts/
+
 # Tests
 tests/
 test.json
 
 # KPFBERT-NER (TOKENIZER + MODEL)
 KPF-bert-ner/
+
+# Neo4j
+neo4j_data/
+neo4j_logs/

@@ -1,23 +1,6 @@
-"""
-환경변수 접근 규칙
-
-- 이 프로젝트의 모든 환경변수는 반드시 settings.X 형태로만 읽는다. os.getenv나
-  os.environ을 코드 어디에서도 직접 사용하지 않는다.
-- .env에 값을 추가해도 아래 Settings 클래스에 필드로 선언하지 않으면 아무도 그 값을
-  읽을 수 없다. pydantic-settings의 env_file 설정은 .env를 읽어 settings 객체의
-  필드를 채울 뿐, os.environ 자체를 변경하지는 않기 때문이다. 즉 settings.X는 항상
-  동작하지만 os.getenv("X")는 이 값을 절대 보지 못한다.
-- 유일한 예외는 LangSmith SDK다. 이 라이브러리는 설정값을 생성자 인자로 받지 않고
-  자기 내부에서 os.environ만 직접 읽도록 만들어져 있어서, settings 값을 넘겨줄 방법이
-  없다. 그래서 이 파일 하단에서 settings 값을 os.environ으로 복사해주는 브릿징 코드를
-  둔다. os.environ 사용은 이런 서드파티 제약이 있을 때만 예외적으로 허용하고, 그 외
-  자체 코드에서는 절대 사용하지 않는다.
-"""
-
 import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import SecretStr
 
 class Settings(BaseSettings):
     """
@@ -33,12 +16,7 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    LLM_PROVIDER: str
-
-    OPENAI_MODEL: str
     GEMINI_MODEL: str
-
-    OPENAI_API_KEY: SecretStr
     GOOGLE_API_KEY: str
 
     NEO4J_URI: str

@@ -8,40 +8,42 @@ Neo4j에 데이터가 없으면 먼저 시드를 적재한 뒤, 그래프 워크
 import asyncio
 import uuid
 
+from langchain_core.tracers.langchain import wait_for_all_tracers
+
+from app.crud import upsert_triplets
 from app.scripts.seed_db import seed
 from app.graph.workflow import GraphRunner
 
-TEXT="""
-방산·조선·에너지·금융 중심 존속 법인과 테크·라이프 중심 신설 법인 분리
-김동관·김동원·김동선 독립경영 체계 구축
+TEXT = """
+인공지능(AI) 반도체 기업 엔비디아가 네이버에 대규모 투자를 단행한다는 소식에 네이버 주가가 27일 장중 급등했다.
 
-한화가 15일 임시주총에서 인적분할 안건을 통과시켰다. /한화
-한화가 15일 임시주총에서 인적분할 안건을 통과시켰다. /한화
+이날 한국거래소에 따르면 오전 10시 14분 현재 네이버(NAVER)는 전 거래일 대비 8.67% 오른 22만5,500원에 거래되고 있다. 장 초반에는 상승폭이 10%를 넘기도 했다.
 
+주가를 끌어올린 것은 엔비디아의 전략적 투자 유치다. 네이버는 이날 엔비디아를 대상으로 약 1조4,809억원(10억달러) 규모의 제3자배정 유상증자를 결정했다고 공시했다. 발행가는 주당 20만4,500원으로, 엔비디아는 이번 투자로 네이버 지분 4.5%를 확보해 3대 주주에 오른다. 양사는 글로벌 AI 팩토리를 공동 구축하기로 했다. 네이버가 데이터센터 부지와 운영을 맡고 엔비디아가 그래픽처리장치(GPU)를 공급하는 구조다.
 
-[더팩트 | 문은혜 기자] 한화그룹의 지주사인 ㈜한화가 15일 임시주주총회를 열고 방산·조선·에너지·금융 중심의 존속 법인과 테크·라이프(기계·유통) 중심의 신설 법인을 분리하는 계획안을 통과시켰다.
-
-이번 인적분할에 따라 한화비전, 한화모멘텀, 한화세미텍, 한화로보틱스 등 테크 분야 계열사들과 한화갤러리아, 한화호텔앤드리조트, 아워홈 등 라이프 분야 계열사들은 신설법인 '한화머시너리앤서비스홀딩스'에 속하게 된다.
-
-존속법인에는 한화에어로스페이스, 한화오션, 한화솔루션, 한화생명 등 방산·조선·에너지와 금융 계열사가 남는다.
-
-분할 비율은 존속 법인 76 대 신설 법인 24 수준으로 산정됐다. 기존 주주들은 분할 비율대로 존속법인과 신설법인 주식을 배정받는다.
-
-업계에서는 이번 인적분할로 한화그룹 3형제의 경영 승계 구도가 굳혀진 것으로 보고 있다. 김승연 회장의 장남인 김동관 부회장은 방산·조선·에너지 사업을, 김동원 사장은 금융 계열사를, 김동선 부사장은 신설법인에 속한 사업을 맡게 된다.
-
-발로 뛰는 더팩트는 24시간 여러분의 제보를 기다립니다.
-▶카카오톡: '더팩트제보' 검색
-▶이메일: jebo@tf.co.kr
-▶뉴스 홈페이지: http://talk.tf.co.kr/bbs/report/write
+이날 증시에서는 AI 인프라 투자 기대감에 관련주가 동반 강세를 보였다. 네이버는 국내 대표 인터넷 검색·플랫폼 기업으로 커머스, 클라우드, AI 사업을 영위하고 있다.
 """
+
 
 async def main() -> None:
     # 실행 전에 DB가 비어있으면 시드부터 채운다.
     await seed()
 
     runner = GraphRunner()
-    await runner.ainvoke(str(uuid.uuid4()), TEXT)
-    print("Graph completed successfully.")
+    try:
+        news_id = str(uuid.uuid4())
+        final_state = await runner.ainvoke(news_id, TEXT)
+
+        # GraphDB에 반영
+        # await upsert_triplets(news_id, final_state["triplets"])
+        
+        print(f"Graph completed successfully. {len(final_state['triplets'])} triplets saved.")
+    finally:
+        # LangSmith SDK는 트레이스를 백그라운드 스레드에서 배치 업로드한다.
+        # 짧게 실행되는 스크립트는 root(전체 workflow) run의 종료·output 이벤트가
+        # 올라가기 전에 프로세스가 끝나버려 LangSmith에서 최상위 output이 비어 보일 수 있다.
+        # 종료 전에 모든 트레이서가 flush를 마치도록 대기한다.
+        wait_for_all_tracers()
 
 
 if __name__ == "__main__":

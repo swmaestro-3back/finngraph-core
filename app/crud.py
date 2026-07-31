@@ -1,109 +1,114 @@
 # Neo4j CRUD
 from __future__ import annotations
 
+from collections import defaultdict
+from typing import get_args
+
 from app.core.db import neo4j_database
-from app.schemas import (
-    CompanyNetworkResponse,
-    NetworkEdge,
-    NetworkNode,
-    NodeType,
-    ThemeCompaniesResponse,
-    ThemeCompanyItem,
-)
+from app.graph.models import EntityLabel, Triplet
+from app.graph.ontology.predicate_dict import PREDICATE_DICT
+
+# NER 태그를 Neo4j Label 태그로 변환
+# (COMPANY → Company, COUNTRY → Country)
+_TYPE_TO_LABEL: dict[EntityLabel, str] = {
+    label: "".join(part.capitalize() for part in label.split("_"))
+    for label in get_args(EntityLabel)
+}
+
+# 하나의 삼중항관계를 두 개의 삼중항관계로 분해할때 사용
+_ITEM_DECOMPOSITION: dict[str, tuple[str, str]] = {
+    "SUPPLIES_TO": ("SUPPLIES", "SUPPLIED_TO"),
+    "EXPORTS_TO": ("EXPORTS", "EXPORTED_TO"),
+}
+
+# 간선 누적 최대 개수
+# 넘어갈 경우 FIFO로 동작
+_MAX_PROVENANCE = 10
 
 
-def _node_identity(node) -> tuple[str, NodeType, str]:
-    if "Company" in node.labels:
-        return node["ticker"], "COMPANY", node["name"]
-    return str(node["theme_id"]), "THEME", node["name"]
+def _edge_specs(triplet: Triplet) -> list[tuple[str, str, str, str, str]]:
+    """하나의 Triplet을 (subject_label, subject_name, rel, object_label, object_name) 엣지 목록으로 변환한다.
 
+    item이 없으면 (subject)-[predicate]->(object) 단일 엣지로,
+    item이 있으면 _ITEM_DECOMPOSITION 규칙에 따라 (subject-item), (item-object)
+    두 개의 이항 엣지로 분해한다. 분해된 엣지도 각각 하나의 (subject, rel, object)
+    트리플로 취급하므로, item은 첫 엣지의 object이자 둘째 엣지의 subject가 된다.
+    """
 
-async def get_company_network(
-    company_id: str, hops: int, filter_types: set[str]
-) -> CompanyNetworkResponse | None:
-    """companyId를 기준으로 BELONGS_TO 관계를 hops만큼 양방향 탐색해 서브그래프를 반환한다."""
-    async with neo4j_database.get_session() as session:
-        source_result = await session.run(
-            "MATCH (c:Company {ticker: $companyId}) RETURN c.ticker AS id, c.name AS name",
-            companyId=company_id,
-        )
-        source_record = await source_result.single()
-        if source_record is None:
-            return None
+    # NER Label을 Neo4j Label로 변환
+    subject_label = _TYPE_TO_LABEL[triplet.subject.label]
+    object_label = _TYPE_TO_LABEL[triplet.object.label]
 
-        # 가변 길이 경로의 범위는 Cypher 파라미터 바인딩이 불가능하므로, FastAPI Query(ge=1, le=3)로
-        # 이미 검증된 int인 hops를 쿼리 문자열에 직접 삽입한다.
-        path_result = await session.run(
-            f"""
-            MATCH (source:Company {{ticker: $companyId}})
-            MATCH path = (source)-[:BELONGS_TO*1..{hops}]-(other)
-            WHERE other <> source
-            RETURN path
-            """,
-            companyId=company_id,
-        )
-        paths = [record["path"] async for record in path_result]
+    if triplet.item is None:
+        # predicate는 FPDF가 PREDICATE_DICT에 등록된 술어에만 트리플을 만들어주므로 항상
+        # 화이트리스트 안이지만, 관계 타입으로 직접 삽입되는 값이라 한 번 더 방어적으로 검증한다.
+        if triplet.predicate not in PREDICATE_DICT:
+            return []
+        return [(subject_label, triplet.subject.text, triplet.predicate, object_label, triplet.object.text)]
 
-    nodes: dict[str, NetworkNode] = {
-        company_id: NetworkNode(id=company_id, type="COMPANY", name=source_record["name"], hop=0)
-    }
-    edges: dict[tuple[str, str], NetworkEdge] = {}
+    decomposition = _ITEM_DECOMPOSITION.get(triplet.predicate)
+    # item이 있으나 분해 규칙이 없는 술어면 item을 버리고 이항 관계로만 저장한다.
+    if decomposition is None:
+        if triplet.predicate not in PREDICATE_DICT:
+            return []
+        return [(subject_label, triplet.subject.text, triplet.predicate, object_label, triplet.object.text)]
 
-    for path in paths:
-        path_nodes = list(path.nodes)
-        for hop, (prev_node, next_node) in enumerate(zip(path_nodes, path_nodes[1:]), start=1):
-            prev_id, prev_type, prev_name = _node_identity(prev_node)
-            next_id, next_type, next_name = _node_identity(next_node)
-
-            if prev_id not in nodes or nodes[prev_id].hop > hop - 1:
-                nodes[prev_id] = NetworkNode(id=prev_id, type=prev_type, name=prev_name, hop=hop - 1)
-            if next_id not in nodes or nodes[next_id].hop > hop:
-                nodes[next_id] = NetworkNode(id=next_id, type=next_type, name=next_name, hop=hop)
-
-            edge_key = (prev_id, next_id)
-            if edge_key not in edges or edges[edge_key].hop > hop:
-                edges[edge_key] = NetworkEdge(from_=prev_id, to=next_id, relation="BELONGS_TO", hop=hop)
-
-    kept_node_ids = {
-        node_id for node_id, node in nodes.items() if node_id == company_id or node.type in filter_types
-    }
-    final_nodes = [node for node_id, node in nodes.items() if node_id in kept_node_ids]
-    final_edges = [
-        edge for edge in edges.values() if edge.from_ in kept_node_ids and edge.to in kept_node_ids
+    item_label = _TYPE_TO_LABEL[triplet.item.label]
+    rel_subject_item, rel_item_object = decomposition
+    return [
+        (subject_label, triplet.subject.text, rel_subject_item, item_label, triplet.item.text),
+        (item_label, triplet.item.text, rel_item_object, object_label, triplet.object.text),
     ]
 
-    return CompanyNetworkResponse(sourceCompanyId=company_id, nodes=final_nodes, edges=final_edges)
 
+async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
+    """추출된 삼중항관계를 Neo4j에 반영
 
-async def get_theme_companies(theme_id: int, top: int) -> ThemeCompaniesResponse | None:
-    """themeId에 속한 기업을 시가총액(mrkTotAmt) 내림차순으로 top개 반환한다."""
-    async with neo4j_database.get_session() as session:
-        theme_result = await session.run(
-            "MATCH (t:Theme {theme_id: $themeId}) RETURN t.name AS name",
-            themeId=theme_id,
-        )
-        theme_record = await theme_result.single()
-        if theme_record is None:
-            return None
+    1. 3rd Argument인 Item을 가진 술어는 하나의 삼중항관계를 두 개의 삼중항관계로 분해
+    2. 동일한 news_id에서 동일한 삼중항관계가 추가되는 경우에는 배척
+    3. 동일한 삼중항관계에 대해서는 총 _MAX_PROVENANCE 개수만큼만 저장가능 (그 이후부터는 FIFO 전략으로 관리)
+    4. 하나의 간선이 추가될때, first_mentioned_at, last_mentioned_at, mention_count등 메타데이터가 저장된다.
+    """
 
-        companies_result = await session.run(
-            """
-            MATCH (:Theme {theme_id: $themeId})<-[:BELONGS_TO]-(c:Company)
-            RETURN c.ticker AS id, c.name AS name, c.market AS market, c.mrkTotAmt AS mrkTotAmt
-            ORDER BY c.mrkTotAmt DESC
-            LIMIT $top
-            """,
-            themeId=theme_id,
-            top=top,
-        )
-        companies = [
-            ThemeCompanyItem(
-                id=record["id"],
-                name=record["name"],
-                market=record["market"],
-                mrkTotAmt=record["mrkTotAmt"],
+    # (subject_label, rel, object_label) 시그니처가 같은 엣지끼리 묶어 UNWIND 한 번으로 MERGE 한다.
+    grouped: dict[tuple[str, str, str], list[dict]] = defaultdict(list)
+    for triplet in triplets:
+        for subject_label, subject_name, rel, object_label, object_name in _edge_specs(triplet):
+            grouped[(subject_label, rel, object_label)].append(
+                {
+                    "subject_name": subject_name,
+                    "object_name": object_name,
+                    "source_sentence": triplet.source_sentence,
+                }
             )
-            async for record in companies_result
-        ]
 
-    return ThemeCompaniesResponse(themeId=theme_id, themeName=theme_record["name"], companies=companies)
+    for (subject_label, rel, object_label), rows in grouped.items():
+        await neo4j_database.execute(
+            f"""
+            UNWIND $rows AS row
+            MERGE (s:{subject_label} {{name: row.subject_name}})
+            MERGE (o:{object_label} {{name: row.object_name}})
+            MERGE (s)-[r:{rel}]->(o)
+            WITH r, row,
+                 $news_id IN coalesce(r.news_ids, []) AS is_dup,
+                 size(coalesce(r.news_ids, [])) >= $max_provenance AS at_cap
+            SET r.first_mentioned_at = coalesce(r.first_mentioned_at, date()),
+                r.last_mentioned_at = CASE WHEN is_dup THEN coalesce(r.last_mentioned_at, date())
+                                           ELSE date() END,
+                r.mention_count = coalesce(r.mention_count, 0)
+                    + (CASE WHEN is_dup THEN 0 ELSE 1 END),
+                r.news_ids = CASE
+                    WHEN is_dup THEN r.news_ids
+                    WHEN at_cap THEN r.news_ids[1..] + $news_id
+                    ELSE coalesce(r.news_ids, []) + $news_id END,
+                r.source_sentences = CASE
+                    WHEN is_dup THEN r.source_sentences
+                    WHEN at_cap THEN r.source_sentences[1..] + row.source_sentence
+                    ELSE coalesce(r.source_sentences, []) + row.source_sentence END,
+                r.mentioned_ats = CASE
+                    WHEN is_dup THEN r.mentioned_ats
+                    WHEN at_cap THEN r.mentioned_ats[1..] + date()
+                    ELSE coalesce(r.mentioned_ats, []) + date() END
+            """,
+            {"rows": rows, "news_id": news_id, "max_provenance": _MAX_PROVENANCE},
+        )

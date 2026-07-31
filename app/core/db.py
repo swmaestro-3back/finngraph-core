@@ -22,6 +22,9 @@ class Neo4jDatabase:
     # URI에 맞는 Driver 생성 (BoltDriver 또는 Neo4jDriver)
     # DB Connection을 생성하기 위한 인증 정보 및 Connection Pool 관리
     async def init_driver(self):
+        # 이미 초기화된 드라이버가 있으면 재사용
+        if self._driver:
+            return
         try:
             self._driver = AsyncGraphDatabase.driver(
                 settings.NEO4J_URI,
