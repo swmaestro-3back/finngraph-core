@@ -51,6 +51,7 @@ Your sole task is to extract multilateral business relationships among entities 
    - When a clause is phrased from the counterparty's point of view, restate it in the matching predicate's direction before extracting. e.g. "A가 B로부터 X를 구매했다" restates as "B가 A에게 X를 공급한다" → extract SUPPLIES_TO(subject=B, object=A, item=X).
    - Extract implied relationships between two COMPANY/GOVERNMENT/COUNTRY entities whenever the surrounding context clearly presupposes them, even without a single verb connecting the two directly — e.g., two companies jointly founding a venture presupposes PARTNERS_WITH between them.
    - Extract a frame only when the relationship is actually stated or clearly implied. Entities that merely co-occur in a sentence with no relational content between them do not form a frame.
+   - "Stated or clearly implied" includes the article making a claim that a relation does NOT hold, no longer holds, or was denied/refuted — a denial or termination is still a claim about the relation between the two entities, not an absence of one. Extract the frame identifying the entity pair and predicate exactly as you would for an affirmed relationship; e.g. "A는 B와의 협력설을 부인했다" still yields PARTNERS_WITH(subject=A, object=B). Do not decide whether the relation is affirmed, denied, or terminated — that judgment belongs to a downstream annotation stage, not to this extraction step. This does not license extracting frames for entities that are merely mentioned alongside a rumor or speculation with no actual claim connecting them — the claim (affirmed, denied, or terminated) must still be concretely about that specific pair.
 2. Strict Frame Structure: Every extracted frame must contain "subject", "predicate", and "object". Some predicates in the registered_predicates list additionally declare an "item" argument (shown as "item=... [mandatory]" or "item=... [optional]"). For those predicates, also fill "item" within the same frame (do not split it into a separate frame) whenever the text names a specific product/commodity. If a predicate's item argument is marked [mandatory], do not extract that frame at all unless a specific item entity is named in the text. Never extract any other additional arguments, modifiers, temporal information (time/date), monetary amounts, or percentage shares.
 3. Arguments Must Match NER Entities: The values of "subject", "object", and "item" MUST exactly match the surface forms provided in the "NER Results (entities)" list below. Never use terms (e.g., general nouns, abstract concepts, or unrecognized words) that are not present in the given "entities" list. If an entity is not available in the list to fill subject or object, do not extract that frame. Do not invent any values.
 4. Predicate Constraint: The "predicate" MUST be one of the exact strings in the "registered_predicates" list. Do not invent new relationship names.
@@ -70,12 +71,13 @@ _EXAMPLES = [
             "네이버는 경영권 인수 없이 컬리의 지분 5%만 취득하는 지분투자를 단행했다."
             "반면 SK는 계열사 SK엔카를 매각하기로 했다."
             "삼성전자와 애플은 스마트폰 시장에서 경쟁하면서도 디스플레이 분야에서는 협력한다."
+            "에코프로비엠은 LG에너지솔루션과 협력을 논의 중이라는 보도에 대해 사실무근이라고 밝혔다."
         ),
         "entities": (
             "구글(COMPANY), 페이스북(COMPANY), 유튜브(COMPANY), 테슬라(COMPANY), 리비안(COMPANY), "
             "현대차(COMPANY), LG에너지솔루션(COMPANY), 미국(COUNTRY), 배터리(COMMODITY), "
             "네이버(COMPANY), 컬리(COMPANY), SK(COMPANY), SK엔카(COMPANY), "
-            "삼성전자(COMPANY), 애플(COMPANY)"
+            "삼성전자(COMPANY), 애플(COMPANY), 에코프로비엠(COMPANY)"
         ),
         "output": json.dumps(
             {
@@ -121,6 +123,12 @@ _EXAMPLES = [
                         "clause": "삼성전자는 애플과 디스플레이 분야에서 협력한다.",
                         "predicate": "PARTNERS_WITH",
                         "subject": "삼성전자", "object": "애플", "item": None,
+                    },
+                    {
+                        "source_sentence": "에코프로비엠은 LG에너지솔루션과 협력을 논의 중이라는 보도에 대해 사실무근이라고 밝혔다.",
+                        "clause": "에코프로비엠은 LG에너지솔루션과 협력한다.",
+                        "predicate": "PARTNERS_WITH",
+                        "subject": "에코프로비엠", "object": "LG에너지솔루션", "item": None,
                     },
                 ]
             },
