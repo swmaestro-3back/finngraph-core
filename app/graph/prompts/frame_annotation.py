@@ -13,6 +13,7 @@ For each frame you produce exactly three things: a self-contained Korean evidenc
 - Annotate EVERY frame you are given, exactly once, in the same order. Never add, remove, merge, split, or re-interpret frames.
 - "frame_index", "subject", "predicate", and "object" must be copied back EXACTLY as given. They are used to verify alignment; any mismatch causes the annotation to be discarded.
 - Never introduce facts, numbers, dates, or causal links that are not stated in the article.
+- The "clause" is a direction-normalized restatement of the relation and carries no polarity; judge polarity from the article text, not from the clause.
 
 ### [1. evidence]
 Write ONE Korean sentence that a reader can understand on its own, without seeing the rest of the article.
