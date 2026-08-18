@@ -44,15 +44,17 @@ class GraphRunner:
         triplet_builder: TripletBuilder,
     ):
 
-        async def normalize_article(state: GraphState) -> dict:
-            """gazetteer를 토대로 등록된 엔티티 명칭 표준화"""
-            normalized_article = await asyncio.to_thread(entity_extractor.normalize, state["article"])
-            return {"article": normalized_article}
+        async def canonicalize_article(state: GraphState) -> dict:
+            """Replace gazetteer surface forms in the article with canonical names."""
+            canonicalized_article = await asyncio.to_thread(
+                entity_extractor.canonicalize, state["article"]
+            )
+            return {"article": canonicalized_article}
 
         async def extract_entities(state: GraphState) -> dict:
-            """gazetteer를 바탕으로 엔티티 추출"""
+            """Extract entities based on pre-built knowledge base"""
             gazetteer_entities = await asyncio.to_thread(
-                entity_extractor.extract_entities, state["article"]
+                entity_extractor.extract, state["article"]
             )
 
             seen: set[tuple[str, str]] = set()
@@ -66,42 +68,49 @@ class GraphRunner:
             return {"entities": deduped}
 
         async def extract_relations(state: GraphState) -> dict:
-            """관계 후보 프레임만 추출한다 (의미 라벨은 다음 노드에서 붙인다)."""
-            candidates = await relation_extractor.label(state["article"], state["entities"])
-            return {"candidates": candidates}
+            """Extract relation frame candidates by refering to base ontology"""
+            candidate_frames = await relation_extractor.extract(
+                state["article"], state["entities"]
+            )
+            return {"candidate_frames": candidate_frames}
 
         async def annotate_frames(state: GraphState) -> dict:
-            """원문 전체를 다시 보며 evidence/polarity/tense를 붙인다."""
-            relations, annotation_stats = await frame_annotator.annotate(
-                state["article"], state["candidates"]
+            """Define evidence/polarity/tense refering to the article"""
+            annotated_frames, annotation_stats = await frame_annotator.annotate(
+                state["article"], state["candidate_frames"]
             )
-            return {"relations": relations, "annotation_stats": annotation_stats}
+            return {
+                "annotated_frames": annotated_frames,
+                "annotation_stats": annotation_stats,
+            }
 
         async def build_triplets(state: GraphState) -> dict:
-            relations = state["relations"]
+            annotated_frames = state["annotated_frames"]
             return {
-                "triplets": triplet_builder.filter(relations),
+                "triplets": triplet_builder.build(annotated_frames),
                 "triplet_stats": merge_stats(
-                    triplet_builder.stats(relations),
+                    triplet_builder.stats(annotated_frames),
                     state.get("annotation_stats", {}),
                 ),
             }
 
         workflow = StateGraph(GraphState)
 
-        workflow.add_node("normalizer", normalize_article)
-        workflow.add_node("entity_extractor", extract_entities)
-        workflow.add_node("relation_extractor", extract_relations)
-        workflow.add_node("frame_annotator", annotate_frames)
-        workflow.add_node("triplet_builder", build_triplets)
+        # 노드 ID를 래퍼 함수명과 동일하게 둔다. 이 ID가 LangSmith 트레이스에 스텝 이름으로
+        # 그대로 노출되므로, 한 스텝에 이름이 두 개 생기지 않도록 맞춘다.
+        workflow.add_node("canonicalize_article", canonicalize_article)
+        workflow.add_node("extract_entities", extract_entities)
+        workflow.add_node("extract_relations", extract_relations)
+        workflow.add_node("annotate_frames", annotate_frames)
+        workflow.add_node("build_triplets", build_triplets)
 
-        workflow.set_entry_point("normalizer")
+        workflow.set_entry_point("canonicalize_article")
 
-        workflow.add_edge("normalizer", "entity_extractor")
-        workflow.add_edge("entity_extractor", "relation_extractor")
-        workflow.add_edge("relation_extractor", "frame_annotator")
-        workflow.add_edge("frame_annotator", "triplet_builder")
-        workflow.add_edge("triplet_builder", END)
+        workflow.add_edge("canonicalize_article", "extract_entities")
+        workflow.add_edge("extract_entities", "extract_relations")
+        workflow.add_edge("extract_relations", "annotate_frames")
+        workflow.add_edge("annotate_frames", "build_triplets")
+        workflow.add_edge("build_triplets", END)
 
         return workflow.compile()
 

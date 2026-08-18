@@ -21,7 +21,7 @@ def _frame(**overrides) -> RelationFrame:
 def test_denied_frame_is_no_longer_dropped():
     builder = TripletBuilder()
 
-    triplets = builder.filter([_frame(polarity="denied")])
+    triplets = builder.build([_frame(polarity="denied")])
 
     assert len(triplets) == 1
     assert triplets[0].polarity == "denied"
@@ -30,7 +30,7 @@ def test_denied_frame_is_no_longer_dropped():
 def test_terminated_frame_is_no_longer_dropped():
     builder = TripletBuilder()
 
-    triplets = builder.filter([_frame(polarity="terminated")])
+    triplets = builder.build([_frame(polarity="terminated")])
 
     assert len(triplets) == 1
     assert triplets[0].polarity == "terminated"
@@ -39,7 +39,7 @@ def test_terminated_frame_is_no_longer_dropped():
 def test_triplet_carries_evidence_and_tense():
     builder = TripletBuilder()
 
-    triplet = builder.filter([_frame()])[0]
+    triplet = builder.build([_frame()])[0]
 
     assert triplet.evidence == "에코프로비엠은 올 하반기부터 삼성SDI에 양극재를 공급한다."
     assert triplet.tense == "future_or_planned"
@@ -49,7 +49,7 @@ def test_triplet_carries_evidence_and_tense():
 def test_unregistered_predicate_is_still_dropped():
     builder = TripletBuilder()
 
-    assert builder.filter([_frame(predicate="NOT_A_PREDICATE")]) == []
+    assert builder.build([_frame(predicate="NOT_A_PREDICATE")]) == []
 
 
 def test_subject_type_violation_is_still_dropped():
@@ -58,13 +58,13 @@ def test_subject_type_violation_is_still_dropped():
     # SUPPLIES_TO의 supplier는 COMPANY만 허용된다
     frame = _frame(subject=Entity(text="미국", label="COUNTRY"))
 
-    assert builder.filter([frame]) == []
+    assert builder.build([frame]) == []
 
 
 def test_frames_differing_only_in_polarity_are_both_kept():
     builder = TripletBuilder()
 
-    triplets = builder.filter([_frame(polarity="affirmed"), _frame(polarity="terminated")])
+    triplets = builder.build([_frame(polarity="affirmed"), _frame(polarity="terminated")])
 
     assert len(triplets) == 2
 

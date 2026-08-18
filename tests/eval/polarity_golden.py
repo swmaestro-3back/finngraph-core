@@ -24,7 +24,7 @@ from app.graph.nodes.relation_extractor import RelationExtractor
 # (기사 본문, {(subject, predicate, object): 기대 polarity})
 # 기대값은 스펙 §6의 결정 규칙에 따라 수동 라벨링했다.
 #
-# 참고: EntityExtractor.normalize()는 gazetteer에 등록된 이표기(surface form)를
+# 참고: EntityExtractor.canonicalize()는 gazetteer에 등록된 이표기(surface form)를
 # 표준 명칭(canonical name)으로 치환한다. 아래 "포스코케미칼" 관련 사례는
 # gazetteer 상 표준 명칭이 "포스코퓨처엠"이라 정규화 후 엔티티 텍스트가
 # "포스코퓨처엠"이 된다. 따라서 기대 관계 키(expectations)는 기사 문구가 아니라
@@ -64,9 +64,9 @@ async def _run_article(
     frame_annotator: FrameAnnotator,
     article: str,
 ):
-    normalized = entity_extractor.normalize(article)
-    entities = entity_extractor.extract_entities(normalized)
-    candidates = await relation_extractor.label(normalized, entities)
+    normalized = entity_extractor.canonicalize(article)
+    entities = entity_extractor.extract(normalized)
+    candidates = await relation_extractor.extract(normalized, entities)
     frames, stats = await frame_annotator.annotate(normalized, candidates)
     return candidates, frames, stats
 

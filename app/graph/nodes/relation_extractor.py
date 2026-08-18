@@ -97,7 +97,7 @@ class RelationExtractor:
             method="json_schema",
         )
 
-    async def label(
+    async def extract(
         self,
         text: str,
         entities: list[Entity],

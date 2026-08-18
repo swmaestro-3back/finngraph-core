@@ -1,6 +1,6 @@
 from typing import get_args
 
-from app.graph.models import Entity, Polarity, RelationFrame, TenseLabel, Triplet
+from app.graph.models import Entity, Polarity, RelationFrame, Tense, Triplet
 from app.graph.ontology.predicate_dict import PREDICATE_DICT
 
 
@@ -8,12 +8,12 @@ class TripletBuilder:
     def __init__(self):
         self._predicate_dict: dict = PREDICATE_DICT
 
-    def filter(self, relation_frames: list[RelationFrame]) -> list[Triplet]:
-        """삼중항관계 중복제거"""
+    def build(self, relation_frames: list[RelationFrame]) -> list[Triplet]:
+        """관계 프레임을 온톨로지로 검증해 삼중항으로 변환하고 중복을 제거한다."""
         triples: list[Triplet] = []
         seen: set[str] = set()
         for frame in relation_frames:
-            triple = self._filter_triplets(frame)
+            triple = self._to_triplet(frame)
             if triple is None:
                 continue
             key = triple.model_dump_json()
@@ -23,7 +23,7 @@ class TripletBuilder:
             triples.append(triple)
         return triples
 
-    def _filter_triplets(self, frame: RelationFrame) -> Triplet | None:
+    def _to_triplet(self, frame: RelationFrame) -> Triplet | None:
         # polarity(affirmed/denied/terminated)는 여기서 필터링하지 않는다.
         # 부정형이라고 간선을 지우지 않고, 라벨로 구분해 UI에서 함께 보여주는 것이 제품 방향이다.
 
@@ -77,12 +77,12 @@ class TripletBuilder:
 
         # 한 번도 등장하지 않은 라벨도 0으로 남도록 모든 값을 미리 채워둔다.
         polarity_counts: dict[str, int] = {polarity: 0 for polarity in get_args(Polarity)}
-        tense_counts: dict[str, int] = {tense: 0 for tense in get_args(TenseLabel)}
+        tense_counts: dict[str, int] = {tense: 0 for tense in get_args(Tense)}
         for frame in relation_frames:
             polarity_counts[frame.polarity] += 1
             tense_counts[frame.tense] += 1
 
-        passed = len(self.filter(relation_frames))
+        passed = len(self.build(relation_frames))
 
         return {
             "total_frames": total,
