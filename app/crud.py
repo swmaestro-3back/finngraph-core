@@ -71,9 +71,17 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
     """
 
     # (subject_label, rel, object_label) 시그니처가 같은 엣지끼리 묶어 UNWIND 한 번으로 MERGE 한다.
+    # 같은 뉴스 안에서 여러 문장이 동일 간선으로 수렴하면 첫 문장만 대표 근거로 남긴다.
+    # 쿼리의 is_dup 가드는 쿼리 시작 시점의 news_ids만 보므로(플래너가 WITH와 SET 사이에
+    # Eager를 끼워 모든 row의 is_dup을 먼저 평가한다) 배치 내 중복은 여기서 걸러야 한다.
     grouped: dict[tuple[str, str, str], list[dict]] = defaultdict(list)
+    seen_edges: set[tuple[str, str, str, str, str]] = set()
     for triplet in triplets:
         for subject_label, subject_name, rel, object_label, object_name in _edge_specs(triplet):
+            edge_key = (subject_label, subject_name, rel, object_label, object_name)
+            if edge_key in seen_edges:
+                continue
+            seen_edges.add(edge_key)
             grouped[(subject_label, rel, object_label)].append(
                 {
                     "subject_name": subject_name,

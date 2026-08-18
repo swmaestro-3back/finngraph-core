@@ -83,8 +83,11 @@ docker compose up -d
 # check status / wait for the healthcheck to pass
 docker compose ps
 
-# stop it later
+# stop
 docker compose down
+
+# stop it and delete the neo4j_data volume (wipes all stored data)
+docker compose down -v
 ```
 
 This launches a `finngraph-neo4j` container exposing the Neo4j Browser at http://localhost:7474 and the Bolt driver at `bolt://localhost:7687`. Data and logs are bind-mounted to `./neo4j_data` and `./neo4j_logs`. Credentials come from `NEO4J_USERNAME` / `NEO4J_PASSWORD` in your `.env`.

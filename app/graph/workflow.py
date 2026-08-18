@@ -6,22 +6,22 @@ from app.graph.state import GraphState
 from app.graph.models import Entity
 from app.graph.nodes.relation_extractor import RelationExtractor
 from app.graph.nodes.triplet_builder import TripletBuilder
-from app.graph.nodes.gazetteer import Gazetteer
+from app.graph.nodes.entity_extractor import EntityExtractor
 
 class GraphRunner:
     def __init__(self):
-        self._gazetteer = Gazetteer()
+        self.entity_extractor = EntityExtractor()
         self._relation_extractor = RelationExtractor()
         self._triplet_builder = TripletBuilder()
         self._graph = self._compile_graph(
-            self._gazetteer,
+            self.entity_extractor,
             self._relation_extractor,
             self._triplet_builder,
         )
 
     def _compile_graph(
         self,
-        gazetteer: Gazetteer,
+        entity_extractor: EntityExtractor,
         relation_extractor: RelationExtractor,
         triplet_builder: TripletBuilder,
     ):
@@ -30,7 +30,7 @@ class GraphRunner:
             """
             gazetteer를 토대로 등록된 엔티티 명칭 표준화
             """
-            normalized_article = await asyncio.to_thread(gazetteer.normalize, state["article"])
+            normalized_article = await asyncio.to_thread(entity_extractor.normalize, state["article"])
             return {"article": normalized_article}
 
         async def extract_entities(state: GraphState) -> dict:
@@ -38,7 +38,7 @@ class GraphRunner:
             gazetteer를 바탕으로 엔티티 추출
             """
             gazetteer_entities = await asyncio.to_thread(
-                gazetteer.extract_entities, state["article"]
+                entity_extractor.extract_entities, state["article"]
             )
 
             seen: set[tuple[str, str]] = set()
