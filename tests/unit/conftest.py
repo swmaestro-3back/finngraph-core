@@ -1,6 +1,8 @@
-"""유닛 테스트는 실제 LLM·DB를 호출하지 않지만, app.core.config가 import 시점에
-Settings()를 만들기 때문에 환경변수가 없으면 모듈 import 자체가 실패한다.
-테스트 모듈이 import되기 전에 더미 값을 채워둔다. 이미 설정된 값은 덮어쓰지 않는다.
+"""
+Fill in dummy environment variables before any test module is imported
+
+Unit tests never touch a real LLM or database, but app.core.config builds Settings() at
+import time, so a missing variable breaks the import itself. Existing values are left alone.
 """
 
 import os

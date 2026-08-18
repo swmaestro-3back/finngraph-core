@@ -109,7 +109,7 @@ _FEW_SHOT_PROMPT = FewShotChatMessagePromptTemplate(
     examples=_EXAMPLES,
 )
 
-# system 본문을 SystemMessage 인스턴스로 직접 넣어 템플릿 변수({}) 파싱을 타지 않게 한다.
+# Passing a SystemMessage instance keeps the system body out of template-variable parsing
 PROMPT = ChatPromptTemplate.from_messages([
     SystemMessage(content=_SYSTEM),
     _FEW_SHOT_PROMPT,

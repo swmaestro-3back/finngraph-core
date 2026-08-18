@@ -1,7 +1,6 @@
-# BIO 표기법 레이블 목록 (150 B- + 149 I- + 1 O = 300개)
-# KPF/KPF-BERT-NER 모델의 레이블 상수 매핑
-# 모델이 정수값을 뱉고 정수값은 아래의 라벨 데이터들의 인덱스와 매핑되는 구조라 필수적으로 참고해야하는 데이터
-# 출처: https://github.com/KPF-bigkinds/BIGKINDS-LAB/blob/main/KPF-BERT-NER/label.py
+# BIO label set for the KPF-BERT-NER model (150 B- + 149 I- + 1 O = 300 labels).
+# The model emits integer ids that index into this list, so the order must never change.
+# Source: https://github.com/KPF-bigkinds/BIGKINDS-LAB/blob/main/KPF-BERT-NER/label.py
 KPF_BERT_LABELS: list[str] = [
     'B-AFA_ART_CRAFT', 'B-AFA_DOCUMENT', 'B-AFA_MUSIC', 'B-AFA_PERFORMANCE', 'B-AFA_VIDEO',
     'B-AFW_OTHER_PRODUCTS', 'B-AFW_SERVICE_PRODUCTS',
@@ -63,23 +62,23 @@ KPF_BERT_LABELS: list[str] = [
 ID2KPF: dict[int, str] = {i: label for i, label in enumerate(KPF_BERT_LABELS)}
 
 KPF2FINNGRAPH: dict[str, str | None] = {
-    # COMPANY: 경제기관(기업·은행·증권사 등)
+    # COMPANY: economic organizations such as corporations, banks and brokerages
     'OGG_ECONOMY':    'COMPANY',
 
-    # GOVERNMENT: 국가 행정·공권력 기관
-    'OGG_POLITICS':   'GOVERNMENT',  # 정부/행정
+    # GOVERNMENT: state administrative and public authority bodies
+    'OGG_POLITICS':   'GOVERNMENT',  # government / administration
 
-    # COUNTRY: 국가 (수도는 종종 그 나라 정부를 환유적으로 지칭하므로 포함)
+    # COUNTRY: nations. Capitals are included because they often stand in for the government.
     'LCP_COUNTRY':      'COUNTRY',
     'LCP_CAPITALCITY':  'COUNTRY',
 
-    # COMODOTIY: 원자재·상품 (금속, 농산물, 에너지 등)
+    # COMMODITY: raw materials such as metals, agricultural goods and energy
     'MT_METAL':         'COMMODITY',
     'MT_ROCK':          'COMMODITY',
     'MT_CHEMICAL':      'COMMODITY',
     'MT_ELEMENT':       'COMMODITY',
 
-    # PRODUCT: 제품·서비스·금융상품
+    # PRODUCT: products, services and financial instruments
     'TMI_HW':             'PRODUCT',
     'TMI_SW':             'PRODUCT',
     'TMI_MODEL':          'PRODUCT',
@@ -89,7 +88,6 @@ KPF2FINNGRAPH: dict[str, str | None] = {
 
 def kpf_to_finngraph_label(kpf_label: str) -> str | None:
     """
-    KPF_LABEL을 FINNGRAPH_LABEL로 변환
-    매핑 없는 레이블은 None 반환.
+    Map a KPF label to a FinnGraph label, or None if it has no mapping
     """
     return KPF2FINNGRAPH.get(kpf_label)

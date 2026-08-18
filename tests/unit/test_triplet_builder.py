@@ -55,7 +55,7 @@ def test_unregistered_predicate_is_still_dropped():
 def test_subject_type_violation_is_still_dropped():
     builder = TripletBuilder()
 
-    # SUPPLIES_TO의 supplier는 COMPANY만 허용된다
+    # SUPPLIES_TO only allows COMPANY as its supplier
     frame = _frame(subject=Entity(text="미국", label="COUNTRY"))
 
     assert builder.build([frame]) == []

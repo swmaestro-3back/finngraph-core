@@ -7,13 +7,13 @@ from app.graph.ontology.predicate_dict import PREDICATE_DICT
 
 _PREDICATE_DICT: dict = PREDICATE_DICT
 
-# 술어 이름만 나열하지 않고 description과 argument(역할)별 설명을 함께 조립해 프롬프트에
-# 제공한다. 타입 제약만으로는 방향을 구분할 수 없는 근접 동의어(예: ACQUIRES vs DIVESTS_FROM,
-# PRODUCES vs DEVELOPS)를 LLM이 헷갈리지 않도록 돕는 역할 설명이다.
-# argument가 3개인 술어는 세 번째(item) 역할을 subject/object와 별도로 표시하고, dictionary에
-# 기록된 required 값을 그대로 노출해 "item이 없으면 프레임 자체를 버려야 하는지(mandatory)"
-# 아니면 "item 없이도 추출해도 되는지(optional)"를 LLM이 predicate별로 구분하게 한다.
-# 문서 자체가 요청당 변하지 않으므로 모듈 로드 시 한 번만 조립해둔다.
+# Render each predicate with its description and per-argument roles rather than the bare name.
+# Type constraints alone cannot separate near-synonyms that differ only in direction
+# (ACQUIRES vs DIVESTS_FROM, PRODUCES vs DEVELOPS), so the role text carries that distinction.
+# Three-argument predicates show the item role separately and expose the dictionary's required
+# flag as [mandatory] or [optional], which tells the model whether a frame missing an item
+# should be dropped or extracted anyway.
+# The rendering never changes between requests, so build it once at import time.
 def _format_predicate_entry(predicate: str, entry: dict) -> str:
     arg_names = list(entry["arguments"].keys())
     subject_role, object_role = arg_names[0], arg_names[1]
@@ -224,21 +224,21 @@ _EXAMPLE_PROMPT = ChatPromptTemplate.from_messages([
     ("ai", "{output}"),
 ])
 
-# Few Shot Prompt 조립
+# Assemble the few-shot prompt
 _FEW_SHOT_PROMPT = FewShotChatMessagePromptTemplate(
     example_prompt=_EXAMPLE_PROMPT,
     examples=_EXAMPLES,
 )
 
-# SYSTEM_MESSAGE 조합
+# System prompt + the rendered predicate list
 # SYSTEM_PROMPT + REGISTERED_PREDICATES_STR
 _SYSTEM_MESSAGE = (
     _SYSTEM + "\n\n**Registered predicate list**:\n" + _REGISTERED_PREDICATES_LIST
 )
 
-# 최종 프롬프트: system 지시 + few-shot 예시(_few_shot_prompt가 human/ai 턴으로 펼침) +
-# 요청별 human 메시지(text/entities). SystemMessage 인스턴스로 직접 넣어 시스템 본문이
-# 템플릿 변수({}) 파싱을 타지 않게 한다(술어 설명 등에 중괄호가 있어도 안전).
+# Final prompt: system instructions, the few-shot examples (expanded into human/ai turns), and
+# the per-request human message. Passing a SystemMessage instance keeps the system body out of
+# template-variable parsing, so braces inside predicate descriptions are safe.
 PROMPT = ChatPromptTemplate.from_messages([
     SystemMessage(content= _SYSTEM_MESSAGE),
     _FEW_SHOT_PROMPT,

@@ -1,6 +1,7 @@
-"""data/seed의 country.json, krx.json, us.json을 읽어 docs/neo4j_schema.md 스키마에 맞게 Neo4j에 적재한다.
+"""
+Load data/seed/{country,krx,us}.json into Neo4j following docs/neo4j_schema.md
 
-seed()를 진입점으로 노출하며, app.main의 seed_if_empty()가 DB가 비어있을 때 호출한다.
+seed() is the entry point; app.main calls it when the database is empty.
 """
 
 import json
@@ -15,12 +16,9 @@ def _load(filename: str) -> list[dict]:
         return json.load(f)
 
 
-# UNIQUE CONSTRAINT 생성
-# Neo4j에는 PK라는 개념이 없고 이런 속성이 자동으로 부여되지 않는다.
-# ENTITY 나 RELATION의 ID는 Neo4j가 자동으로 부여하는 고유한 값으로 내 맘대로 지정할 수 없다.
-# 따라서 PK 처럼 동작할 필드를 지정해주어야 한다.
-# 이를 UNIQUE CONSTRAINTS를 통해 구현한다.
-# UNIQUE CONSTRAINTS를 걸면 자동으로 B-TREE를 생성해준다.
+# Neo4j has no primary keys, and the internal ids it assigns to nodes and relationships are
+# not ours to choose. A unique constraint is how a field is made to act like a primary key,
+# and it creates the backing B-tree index for free.
 async def create_constraints() -> None:
     # COMPANY TICKER
     await neo4j_database.execute(
@@ -63,7 +61,7 @@ async def seed_countries() -> None:
 
 
 async def seed_krx_companies() -> None:
-    # KOSDAQ GLOBAL은 KOSDAQ 라벨로 합쳐서 저장한다.
+    # KOSDAQ GLOBAL is folded into the KOSDAQ label
     rows_by_label: dict[str, list[dict]] = {"KOSPI": [], "KOSDAQ": []}
     for row in _load("krx.json"):
         label = "KOSPI" if row["market"] == "KOSPI" else "KOSDAQ"
@@ -108,14 +106,14 @@ async def seed_us_companies() -> None:
 async def seed():
     await neo4j_database.init_driver()
 
-    # seed가 이미 존재한다면 스킵
+    # Skip if the database has already been seeded
     records = await neo4j_database.execute("MATCH (n) RETURN count(n) AS c")
     node_count = records[0]["c"]
     if node_count > 0:
         print(f"Skip seeding: {node_count} nodes already exist")
         return
     
-    # 실제 SEED DATA가 들어오기 전에 UNIQUE CONSTRAINTS를 설정해줄 수 있다.
+    # Constraints must exist before the seed rows are inserted
     await create_constraints()
 
     await seed_countries()

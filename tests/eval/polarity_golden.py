@@ -1,12 +1,15 @@
-"""polarity 3분류 정확도와 evidence 자립성을 실제 LLM으로 측정하는 평가 스크립트.
+"""
+Measure polarity accuracy and evidence self-containment against the real LLM
 
-실행: uv run python tests/eval/polarity_golden.py
+Run: uv run python tests/eval/polarity_golden.py
 
-측정 항목
-  1. polarity 혼동 행렬 — 특히 denied ↔ terminated 혼동이 핵심 관심사다.
-     둘을 가르는 규칙("이전 성립을 전제하면 terminated")이 프롬프트에서 실제로 작동하는지 본다.
-  2. evidence 자립성 — FrameAnnotator의 그라운딩 검증을 통과한 비율과 길이 분포.
-     드롭률이 높으면 evidence 규칙이 너무 빡빡하거나 프롬프트가 지켜지지 않는다는 신호다.
+What it reports:
+  1. A polarity confusion matrix. denied vs terminated is the pair that matters, since only a
+     prompt rule ("if the text presupposes the relation once held, it is terminated") separates
+     them; the matrix shows whether that rule actually holds.
+  2. Evidence self-containment: the share of frames passing FrameAnnotator's grounding check,
+     plus the length distribution. A high drop rate means the rules are too tight or the prompt
+     is being ignored.
 """
 
 import asyncio
@@ -21,15 +24,14 @@ from app.graph.nodes.entity_extractor import EntityExtractor
 from app.graph.nodes.frame_annotator import FrameAnnotator
 from app.graph.nodes.relation_extractor import RelationExtractor
 
-# (기사 본문, {(subject, predicate, object): 기대 polarity})
-# 기대값은 스펙 §6의 결정 규칙에 따라 수동 라벨링했다.
+# (article text, {(subject, predicate, object): expected polarity})
+# Expectations are hand-labelled following the decision rule in spec section 6.
 #
-# 참고: EntityExtractor.canonicalize()는 gazetteer에 등록된 이표기(surface form)를
-# 표준 명칭(canonical name)으로 치환한다. 아래 "포스코케미칼" 관련 사례는
-# gazetteer 상 표준 명칭이 "포스코퓨처엠"이라 정규화 후 엔티티 텍스트가
-# "포스코퓨처엠"이 된다. 따라서 기대 관계 키(expectations)는 기사 문구가 아니라
-# 정규화된 표준 명칭 "포스코퓨처엠"을 사용한다. 문장 자체는 원문 그대로 유지한다
-# (normalize()가 자동으로 치환하므로 문법적 형태·의미는 변하지 않는다).
+# Note: EntityExtractor.canonicalize() rewrites gazetteer surface forms to their canonical
+# names, so the 포스코케미칼 case below reaches the extractor as 포스코퓨처엠. Expectation keys
+# therefore use the canonical name, not the wording in the article. The sentence itself is left
+# as written, since canonicalize() performs the substitution and neither its grammar nor its
+# meaning changes.
 _GOLDEN: list[tuple[str, dict[tuple[str, str, str], str]]] = [
     (
         "에코프로비엠은 올 하반기부터 삼성SDI에 양극재를 공급한다.",
@@ -76,7 +78,7 @@ async def main() -> None:
     relation_extractor = RelationExtractor()
     frame_annotator = FrameAnnotator()
 
-    # confusion[기대값][실제값] = 개수
+    # confusion[expected][actual] = count
     confusion: dict[str, Counter] = defaultdict(Counter)
     not_extracted = 0
     total_candidates = 0

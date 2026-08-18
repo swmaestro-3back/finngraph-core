@@ -13,20 +13,20 @@ EntityLabel = Literal[
     "COMMODITY", "PRODUCT",
 ]
 
-# 관계의 시제·양태 분류 (UI 표시명은 각각 확정 / 예정 / 관측)
-# 양태 = 사실이나 문장 내용에 대해 가지는 심리적 태도나 판단 (사실, 추측, 가능성, 희망 등)
+# Temporal and modal status of a relation (UI labels: 확정 / 예정 / 관측).
+# Modality is the stance the text takes: fact, conjecture, possibility, intent.
 Tense = Literal[
     "past_or_present_fact",
     "future_or_planned",
     "modal_possibility",
 ]
 
-# 관계의 극성 분류. (UI 표시명은 각각 성립 / 부인 / 종료)
-# 극성 = 특정 사실이나 관계가 긍정인지 부정인지, 아니면 상태 변화인지에 대한 성격
+# Polarity of a relation (UI labels: 성립 / 부인 / 종료).
+# Polarity says whether the relation holds, is denied outright, or has ended.
 Polarity = Literal[
-    "affirmed",     # 관계 성립 확정
-    "denied",       # 관계 부정·부인
-    "terminated",   # 관계 해지·취소·중단
+    "affirmed",     # the relation holds
+    "denied",       # the relation is denied outright
+    "terminated",   # the relation held once and has since been cancelled
 ]
 
 
@@ -146,10 +146,10 @@ class RawAnnotationList(BaseModel):
         description="One annotation per input frame, in the same order as the input list."
     )
 
-# FrameAnnotator까지 통과한 최종 관계 프레임.
+# A relation frame that has been through FrameAnnotator.
 class RelationFrame(CandidateFrame):
-    # 사람이 한 줄만 읽고 이해할 수 있도록 맥락을 복원한 근거. 생성문이므로 원문 대조가
-    # 불가능하고, 대신 subject/object/item 표면형 포함 여부와 길이로 검증한다.
+    # Evidence with context restored, so one line reads on its own. It is generated, so it
+    # cannot be matched against the source; grounding checks surface forms and length instead.
     evidence: str = Field(
         description="A self-contained Korean sentence describing the relationship with restored context.",
     )

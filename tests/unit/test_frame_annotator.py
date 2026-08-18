@@ -35,7 +35,7 @@ def test_valid_annotation_is_merged():
     assert frame.evidence == _EVIDENCE
     assert frame.polarity == "affirmed"
     assert frame.tense == "future_or_planned"
-    # CandidateFrame의 필드는 그대로 보존된다
+    # CandidateFrame fields are carried through untouched
     assert frame.predicate == "SUPPLIES_TO"
     assert frame.source_sentence == _CANDIDATE.source_sentence
     assert frame.clause == _CANDIDATE.clause
@@ -125,7 +125,7 @@ def test_annotations_are_matched_by_index_not_order():
         tense="past_or_present_fact",
     )
 
-    # 순서를 뒤집어 넣어도 frame_index로 매칭되어야 한다
+    # Reversed input order must still match on frame_index
     frames, stats = merge_annotations(
         [_CANDIDATE, second], [second_annotation, _annotation()]
     )

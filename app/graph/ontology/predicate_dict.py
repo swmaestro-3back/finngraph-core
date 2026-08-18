@@ -1,5 +1,5 @@
 PREDICATE_DICT: dict = {
-    # 매각하다
+    # to divest / sell off
     "DIVESTS_FROM": {
         "description": "Subject sells or divests its ownership stake in the object company.",
         "arguments": {
@@ -20,7 +20,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 투자하다
+    # to invest in
     "INVESTS_IN": {
         "description": "Subject makes a simple capital/equity investment into the object (a minority stake), without taking ownership or control. If the subject obtains ownership or control, use ACQUIRES instead.",
         "arguments": {
@@ -43,7 +43,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 협력하다
+    # to partner with
     "PARTNERS_WITH": {
         "description": "Subject cooperates with the object on a shared initiative, or signs a formal agreement/partnership with the object.",
         "arguments": {
@@ -67,7 +67,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 인수하다 (합병·자회사 편입 포함)
+    # to acquire (includes mergers and taking a company as a subsidiary)
     "ACQUIRES": {
         "description": "Subject obtains ownership or control of the object company. This also covers a merger (합병) in which the subject absorbs the object, and the object becoming the subject's subsidiary or affiliate (자회사·계열사 편입) as a result of the deal. For a minority investment without control, use INVESTS_IN instead.",
         "arguments": {
@@ -88,7 +88,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 공급하다 (공급계약 체결·수주 포함)
+    # to supply (includes signing a supply contract or winning an order)
     "SUPPLIES_TO": {
         "description": "Supplier supplies or delivers an item to a recipient. This also covers signing a supply contract or winning a supply order/bid (수주) to provide the item — treat those as SUPPLIES_TO as well.",
         "arguments": {
@@ -118,7 +118,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 수출하다
+    # to export to
     "EXPORTS_TO": {
         "description": "Exporter exports an item to an importing party abroad. Extracted as a single event. If a sentence describes importing (A imports X from B), restate it in this direction (B exports X to A) instead of a separate import predicate.",
         "arguments": {
@@ -148,7 +148,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 위치하다
+    # to be located in
     "LOCATED_IN": {
         "description": "Subject is located or headquartered in the object country.",
         "arguments": {
@@ -168,7 +168,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 생산하다
+    # to produce
     "PRODUCES": {
         "description": "Subject manufactures or mass-produces the object. Use DEVELOPS for the R&D/development stage before mass production.",
         "arguments": {
@@ -189,7 +189,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 경쟁하다
+    # to compete with
     "COMPETES_WITH": {
         "description": "Subject competes with the object company in a product or market. Symmetric relationship. Note that two companies may both compete and cooperate in different areas, so this does not preclude PARTNERS_WITH.",
         "arguments": {
@@ -209,7 +209,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 개발하다
+    # to develop
     "DEVELOPS": {
         "description": "Subject develops or is developing the object as a product/material. Use this for the R&D or development stage (e.g. '개발 중', '개발 완료'), as distinct from actual mass production (use PRODUCES for that).",
         "arguments": {
@@ -230,7 +230,7 @@ PREDICATE_DICT: dict = {
             }
         }
     },
-    # 제재·규제하다
+    # to sanction / impose restrictions on
     "SANCTIONS": {
         "description": "Subject imposes sanctions, export controls, or regulatory restrictions on the object. Typically a government or country acting against another country or a company.",
         "arguments": {
@@ -253,3 +253,5 @@ PREDICATE_DICT: dict = {
         }
     }
 }
+
+REGISTERED_PREDICATES: set[str] = set(PREDICATE_DICT.keys())
