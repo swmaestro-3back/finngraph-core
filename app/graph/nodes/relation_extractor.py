@@ -20,9 +20,10 @@ def build_candidate_frames(
     entities: list[Entity],
     text: str,
 ) -> list[CandidateFrame]:
-    """LLM 원시 출력을 검증해 관계 후보 프레임으로 조립한다.
+    """
+    Validate raw LLM output and assemble grounded relation candidates
 
-    LLM 호출과 분리된 순수 함수라 API 키 없이 단위 테스트할 수 있다.
+    Pure function, kept apart from the LLM call so it can be unit tested without an API key
     """
 
     # 그라운딩 검증용 조회 테이블: subject/object/item 텍스트가 실제 NER 결과에
@@ -102,6 +103,9 @@ class RelationExtractor:
         text: str,
         entities: list[Entity],
     ) -> list[CandidateFrame]:
+        """
+        Extract relation candidates from the article with one LLM call
+        """
         entity_lines = [f"- {e.text} ({e.label})" for e in entities]
         entities_str = "\n".join(entity_lines) if entity_lines else "없음"
 

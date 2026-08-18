@@ -15,9 +15,10 @@ _MAX_EVIDENCE_LENGTH = 200
 
 
 def format_candidates(candidates: list[CandidateFrame]) -> str:
-    """프레임 목록을 LLM에 전달할 텍스트 블록으로 만든다.
+    """
+    Render candidate frames as the numbered text block sent to the LLM
 
-    각 프레임 앞의 [n]이 곧 frame_index이며, LLM은 이 번호를 그대로 돌려줘야 한다.
+    The [n] prefix is the frame_index that the LLM must echo back
     """
 
     lines: list[str] = []
@@ -33,10 +34,11 @@ def format_candidates(candidates: list[CandidateFrame]) -> str:
 
 
 def _is_grounded(evidence: str, candidate: CandidateFrame) -> bool:
-    """evidence가 해당 프레임의 근거로서 최소 조건을 만족하는지 검사한다.
+    """
+    Check whether an evidence sentence can stand as this frame's grounding
 
-    생성문이라 원문 대조가 불가능하므로, subject/object/item 표면형이 실제로 등장하는지와
-    길이만 확인한다. 이 검사는 "대명사를 개체명으로 복원하라"는 지시가 지켜졌는지도 함께 잡는다.
+    Evidence is generated, so it cannot be matched against the source verbatim. Instead
+    require the subject/object/item surface forms to appear in it, within a length cap.
     """
 
     if not evidence or len(evidence) > _MAX_EVIDENCE_LENGTH:
@@ -54,10 +56,11 @@ def merge_annotations(
     candidates: list[CandidateFrame],
     annotations: list[RawAnnotation],
 ) -> tuple[list[RelationFrame], dict[str, int]]:
-    """주석을 프레임에 병합한다. 정합성이 깨진 프레임은 기본값으로 때우지 않고 드롭한다.
+    """
+    Merge annotations into their frames, dropping any frame that fails to line up
 
-    기본값(예: polarity="affirmed")으로 대체하면 "부인했다"가 "성립"으로 둔갑한다.
-    관계 하나를 잃는 비용보다 오정보를 노출하는 비용이 크므로 드롭이 안전한 쪽이다.
+    Filling a default instead would turn a denial into a fact, which costs far more
+    than losing one relation.
     """
 
     # frame_index로 매칭하므로 LLM이 순서를 바꿔 돌려줘도 안전하다.
@@ -133,6 +136,9 @@ class FrameAnnotator:
         text: str,
         candidates: list[CandidateFrame],
     ) -> tuple[list[RelationFrame], dict[str, int]]:
+        """
+        Annotate every candidate frame in one batched LLM call
+        """
         # 프레임이 없으면 LLM을 호출하지 않는다 (빈 목록에 대한 낭비 호출 방지).
         if not candidates:
             return [], {"dropped_annotation_mismatch": 0, "dropped_evidence_grounding": 0}

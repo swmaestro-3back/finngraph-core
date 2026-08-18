@@ -9,7 +9,9 @@ class TripletBuilder:
         self._predicate_dict: dict = PREDICATE_DICT
 
     def build(self, relation_frames: list[RelationFrame]) -> list[Triplet]:
-        """관계 프레임을 온톨로지로 검증해 삼중항으로 변환하고 중복을 제거한다."""
+        """
+        Validate frames against the ontology, convert them to triplets and drop duplicates
+        """
         triples: list[Triplet] = []
         seen: set[str] = set()
         for frame in relation_frames:
@@ -24,6 +26,9 @@ class TripletBuilder:
         return triples
 
     def _to_triplet(self, frame: RelationFrame) -> Triplet | None:
+        """
+        Convert one frame to a triplet, or None if the ontology rejects it
+        """
         # polarity(affirmed/denied/terminated)는 여기서 필터링하지 않는다.
         # 부정형이라고 간선을 지우지 않고, 라벨로 구분해 UI에서 함께 보여주는 것이 제품 방향이다.
 
@@ -69,7 +74,9 @@ class TripletBuilder:
         )
 
     def stats(self, relation_frames: list[RelationFrame]) -> dict:
-        """삼중항 필터링 통계를 반환한다 (디버깅·평가용)."""
+        """
+        Report per-stage counts for debugging and evaluation
+        """
         total = len(relation_frames)
         not_in_dict = sum(
             1 for f in relation_frames if f.predicate not in self._predicate_dict
