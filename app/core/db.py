@@ -19,10 +19,10 @@ class Neo4jDatabase:
     def __init__(self):
         self._driver = None
 
-    # URI에 맞는 Driver 생성 (BoltDriver 또는 Neo4jDriver)
-    # DB Connection을 생성하기 위한 인증 정보 및 Connection Pool 관리
+    # Create the driver matching the URI scheme (BoltDriver or Neo4jDriver). It owns the
+    # credentials and the connection pool shared by every session.
     async def init_driver(self):
-        # 이미 초기화된 드라이버가 있으면 재사용
+        # Reuse the driver if it was already initialized
         if self._driver:
             return
         try:
@@ -33,8 +33,7 @@ class Neo4jDatabase:
         except Exception as e:
             print(f"Error occurred while initializing Neo4j driver: {e}")
 
-    # execute_query가 get_session으로 쿼리날리는 것보다 더 고수준 api
-    # session.close를 알아서 해준다
+    # execute_query sits above the session API and closes the session for us
     async def execute(self, query: LiteralString, parameters: Optional[dict] = None) -> list[Record]:
         if not self._driver:
             raise RuntimeError("Neo4j Driver is not initialized. Call init_driver first.")
@@ -45,7 +44,7 @@ class Neo4jDatabase:
             database_=settings.NEO4J_DATABASE
         )
 
-        # 원래 records, summary, keys 이렇게 3개 주는데 지금은 쿼리 결과인 records만 사용하니 나머지는 버리는 용으로 _ 표기
+        # execute_query returns (records, summary, keys); only records are needed here
         return records
 
 neo4j_database = Neo4jDatabase()

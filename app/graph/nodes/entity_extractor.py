@@ -3,6 +3,7 @@ from flashtext import KeywordProcessor
 from app.graph.models import Entity, EntityLabel
 from app.graph.ontology.gazetteers import COUNTRY_DICT, COMMODITY_DICT, PRODUCT_DICT, COMPANY_DICT
 
+# Pre-built knowledge base dict
 GAZETTEERS: dict[EntityLabel, dict[str, list[str]]] = {
     "COMPANY": COMPANY_DICT,
     "COUNTRY": COUNTRY_DICT,
@@ -12,27 +13,25 @@ GAZETTEERS: dict[EntityLabel, dict[str, list[str]]] = {
 
 class EntityExtractor:
     def __init__(self):
-        # 정규식 치환용
-        self._normalizer = KeywordProcessor(case_sensitive=True)
-        # NER용
+    
+        self._canonicalizer = KeywordProcessor(case_sensitive=True)
         self._processors: dict[EntityLabel, KeywordProcessor] = {}
 
-        # normalizer와 processors에 gazetteer 등록
         for label, gazetteer in GAZETTEERS.items():
             processor = KeywordProcessor(case_sensitive=True)
             processor.add_keywords_from_dict(gazetteer)
-            self._normalizer.add_keywords_from_dict(gazetteer)
+            self._canonicalizer.add_keywords_from_dict(gazetteer)
             self._processors[label] = processor
 
-    def normalize(self, text: str) -> str:
+    def canonicalize(self, text: str) -> str:
         """
-        본문에서 gazetteer에 존재하는 키워드들을 표준 명칭으로 대체한 텍스트를 반환
+        Replace gazetteer surface forms with their canonical names
         """
-        return self._normalizer.replace_keywords(text)
+        return self._canonicalizer.replace_keywords(text)
 
-    def extract_entities(self, text: str) -> list[Entity]:
+    def extract(self, text: str) -> list[Entity]:
         """
-        본문에서 gazetteer에 등록된 키워드들을 추출하여 반환
+        Extract entities using gazetteer
         """
         entities: list[Entity] = []
         for label, processor in self._processors.items():
