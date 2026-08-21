@@ -1,19 +1,19 @@
+"""
+Type-checked settings loaded from .env by pydantic-settings
+Import this settings instance instead of directly reaching for os.getenv
+"""
+
 import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    """
-    Type-checked settings loaded from .env by pydantic-settings
-    Import this settings instance instead of reaching for os.getenv
-    """
 
     # Load values from .env
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        # Ignore any variable not declared below
-        extra="ignore"
+        extra="ignore"  # Ignore any variable not declared below
     )
 
     GEMINI_MODEL: str

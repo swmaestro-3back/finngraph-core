@@ -10,19 +10,6 @@ from app.graph.nodes.triplet_builder import TripletBuilder
 from app.graph.nodes.entity_extractor import EntityExtractor
 
 
-def merge_stats(triplet_stats: dict, annotation_stats: dict) -> dict:
-    """TripletBuilder 통계와 FrameAnnotator 드롭 카운트를 하나의 dict로 합친다.
-
-    드롭은 FrameAnnotator에서 발생하지만 stats()는 살아남은 프레임만 보기 때문에,
-    두 출처를 여기서 합쳐야 손실률이 보인다.
-    """
-
-    merged = dict(triplet_stats)
-    merged["dropped_annotation_mismatch"] = annotation_stats.get("dropped_annotation_mismatch", 0)
-    merged["dropped_evidence_grounding"] = annotation_stats.get("dropped_evidence_grounding", 0)
-    return merged
-
-
 class GraphRunner:
     def __init__(self):
         self._entity_extractor = EntityExtractor()
@@ -84,6 +71,18 @@ class GraphRunner:
                 "annotation_stats": annotation_stats,
             }
 
+        def merge_stats(triplet_stats: dict, annotation_stats: dict) -> dict:
+            """Merge TripletBuilder statistics with FrameAnnotator drop counts.
+
+            Drop counts are captured during annotation, whereas stats() only measures surviving frames.
+            Merging both is required to compute the drop rate.
+            """
+
+            merged = dict(triplet_stats)
+            merged["dropped_annotation_mismatch"] = annotation_stats.get("dropped_annotation_mismatch", 0)
+            merged["dropped_evidence_grounding"] = annotation_stats.get("dropped_evidence_grounding", 0)
+            return merged
+
         async def build_triplets(state: GraphState) -> dict:
             annotated_frames = state["annotated_frames"]
             return {
@@ -96,8 +95,6 @@ class GraphRunner:
 
         workflow = StateGraph(GraphState)
 
-        # 노드 ID를 래퍼 함수명과 동일하게 둔다. 이 ID가 LangSmith 트레이스에 스텝 이름으로
-        # 그대로 노출되므로, 한 스텝에 이름이 두 개 생기지 않도록 맞춘다.
         workflow.add_node("canonicalize_article", canonicalize_article)
         workflow.add_node("extract_entities", extract_entities)
         workflow.add_node("extract_relations", extract_relations)
@@ -115,7 +112,7 @@ class GraphRunner:
         return workflow.compile()
 
     async def ainvoke(self, news_id: str, article: str) -> GraphState:
-        """LangGraph 워크플로우를 비동기로 실행한다."""
+
         final_state = await self._graph.ainvoke(
             GraphState(
                 news_id=news_id,

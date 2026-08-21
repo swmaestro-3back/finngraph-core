@@ -59,9 +59,11 @@ evaluation/results/
 .claude/
 CLAUDE.md
 
+# Superpowers
+.superpowers/
+
 # Docs
 docs/
-wiki/
 
 # Data
 data/
@@ -82,5 +84,4 @@ KPF-bert-ner/
 # Neo4j
 neo4j_data/
 neo4j_logs/
-# SDD 작업 디렉토리 (git 추적 대상 아님)
-.superpowers/
+neo4j-dump/

@@ -66,13 +66,15 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
 
     1. Predicates carrying an item argument are split into two edges.
     2. The same triplet reported again under the same news_id is ignored.
-    3. Each edge keeps at most _MAX_PROVENANCE entries, evicting the oldest first.
+    3. Each edge keeps at most _MAX_PROVENANCE provenance entries (news_ids, evidences,
+       polarities, tenses, mentioned_ats), evicting the oldest first. The five arrays are
+       written together, so entry i of each describes the same mention.
     4. Every edge tracks first_mentioned_at, last_mentioned_at and mention_count.
     """
 
     # Group edges sharing a (subject_label, rel, object_label) signature so each group needs a
     # single UNWIND + MERGE. When several sentences in one article converge on the same edge,
-    # only the first is kept as its evidence.
+    # only the first is kept as its provenance.
     # The query's is_dup guard only sees news_ids as they were when the query started (the
     # planner inserts an Eager between WITH and SET, evaluating is_dup for every row up front),
     # so duplicates within a batch have to be filtered here instead.
@@ -88,7 +90,9 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
                 {
                     "subject_name": subject_name,
                     "object_name": object_name,
-                    "source_sentence": triplet.source_sentence,
+                    "evidence": triplet.evidence,
+                    "polarity": triplet.polarity,
+                    "tense": triplet.tense,
                 }
             )
 
@@ -111,10 +115,18 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
                     WHEN is_dup THEN r.news_ids
                     WHEN at_cap THEN r.news_ids[1..] + $news_id
                     ELSE coalesce(r.news_ids, []) + $news_id END,
-                r.source_sentences = CASE
-                    WHEN is_dup THEN r.source_sentences
-                    WHEN at_cap THEN r.source_sentences[1..] + row.source_sentence
-                    ELSE coalesce(r.source_sentences, []) + row.source_sentence END,
+                r.evidences = CASE
+                    WHEN is_dup THEN r.evidences
+                    WHEN at_cap THEN r.evidences[1..] + row.evidence
+                    ELSE coalesce(r.evidences, []) + row.evidence END,
+                r.polarities = CASE
+                    WHEN is_dup THEN r.polarities
+                    WHEN at_cap THEN r.polarities[1..] + row.polarity
+                    ELSE coalesce(r.polarities, []) + row.polarity END,
+                r.tenses = CASE
+                    WHEN is_dup THEN r.tenses
+                    WHEN at_cap THEN r.tenses[1..] + row.tense
+                    ELSE coalesce(r.tenses, []) + row.tense END,
                 r.mentioned_ats = CASE
                     WHEN is_dup THEN r.mentioned_ats
                     WHEN at_cap THEN r.mentioned_ats[1..] + date()

@@ -10,15 +10,14 @@ from app.graph.models import (
 from app.graph.prompts.frame_annotation import PROMPT
 from app.graph.utils.text import normalize_whitespace
 
-# evidence 길이 상한. 이를 넘으면 문단을 통째로 복사한 것으로 보고 드롭한다.
+
 _MAX_EVIDENCE_LENGTH = 200
 
 
 def format_candidates(candidates: list[CandidateFrame]) -> str:
     """
-    Render candidate frames as the numbered text block sent to the LLM
-
-    The [n] prefix is the frame_index that the LLM must echo back
+    Format candidate frames as the numbered text block for prompt.
+    The [n] prefix serves as the frame index for LLM echo validation.
     """
 
     lines: list[str] = []
@@ -35,10 +34,8 @@ def format_candidates(candidates: list[CandidateFrame]) -> str:
 
 def _is_grounded(evidence: str, candidate: CandidateFrame) -> bool:
     """
-    Check whether an evidence sentence can stand as this frame's grounding
-
-    Evidence is generated, so it cannot be matched against the source verbatim. Instead
-    require the subject/object/item surface forms to appear in it, within a length cap.
+    Verify if the generated evidence grounds the candidate frame.
+    Checks surface-form inclusion of subject/object/item within the maximum length limit.
     """
 
     if not evidence or len(evidence) > _MAX_EVIDENCE_LENGTH:
@@ -63,8 +60,6 @@ def merge_annotations(
     than losing one relation.
     """
 
-    # frame_index로 매칭하므로 LLM이 순서를 바꿔 돌려줘도 안전하다.
-    # 같은 인덱스가 중복되면 첫 번째만 채택한다.
     annotation_by_index: dict[int, RawAnnotation] = {}
     for annotation in annotations:
         if annotation.frame_index in annotation_by_index:
@@ -78,12 +73,12 @@ def merge_annotations(
     for index, candidate in enumerate(candidates):
         annotation = annotation_by_index.get(index)
 
-        # 주석이 아예 없거나(누락), 범위 밖 인덱스만 돌아온 경우
+        # Drop if annotation is missing or out-of-bounds
         if annotation is None:
             dropped_mismatch += 1
             continue
 
-        # 에코 대조: LLM이 인덱스를 어긋나게 매긴 경우를 잡는다
+        # Echo validation: catch LLM index misalignment
         if (
             annotation.subject.strip() != candidate.subject.text
             or annotation.predicate.strip() != candidate.predicate
@@ -137,9 +132,9 @@ class FrameAnnotator:
         candidates: list[CandidateFrame],
     ) -> tuple[list[RelationFrame], dict[str, int]]:
         """
-        Annotate every candidate frame in one batched LLM call
+        Annotate every candidate frame extracted by frame_annotator
         """
-        # 프레임이 없으면 LLM을 호출하지 않는다 (빈 목록에 대한 낭비 호출 방지).
+
         if not candidates:
             return [], {"dropped_annotation_mismatch": 0, "dropped_evidence_grounding": 0}
 

@@ -1,5 +1,5 @@
 """
-Load data/seed/{country,krx,us}.json into Neo4j following docs/neo4j_schema.md
+Load data/seed/{country,krx,us,themes}.json into Neo4j following docs/neo4j_schema.md
 
 seed() is the entry point; app.main calls it when the database is empty.
 """
@@ -35,6 +35,15 @@ async def create_constraints() -> None:
         FOR (c:Country) REQUIRE c.iso_num IS UNIQUE
         """
     )
+    
+    # THEME NAME
+    await neo4j_database.execute(
+        """
+        CREATE CONSTRAINT theme_name_unique IF NOT EXISTS
+        FOR (t:Theme) REQUIRE t.name IS UNIQUE
+        """
+    )
+
     print("Constraints created")
 
 
@@ -102,6 +111,46 @@ async def seed_us_companies() -> None:
         )
         print(f"Company:{label}: {len(rows)} nodes merged")
 
+async def seed_themes() -> None:
+    """
+    Merge Theme nodes and (Company)-[:BELONGS_TO]->(Theme) edges
+
+    Must run after the company seeds: a theme member whose ticker has no Company node is
+    skipped, which is how preferred shares (우선주) in the source data get dropped.
+    """
+    rows = [
+        {
+            "name": theme["name"],
+            "source_theme_id": theme["source_theme_id"],
+            "description": theme["description"],
+            "source": theme["source"],
+            "companies": [
+                {"ticker": company["ticker"], "reason": company["reason"]}
+                for company in theme["companies"]
+            ],
+        }
+        for theme in _load("themes.json")
+    ]
+
+    await neo4j_database.execute(
+        """
+        UNWIND $rows AS row
+        MERGE (t:Theme {name: row.name})
+        ON CREATE SET t.id = randomUUID()
+        SET t.source_theme_id = row.source_theme_id,
+            t.description = row.description,
+            t.source = row.source
+        WITH t, row
+        UNWIND row.companies AS company
+        MATCH (c:Company {ticker: company.ticker})
+        MERGE (c)-[r:BELONGS_TO]->(t)
+        SET r.reason = company.reason
+        """,
+        {"rows": rows},
+    )
+    edge_count = sum(len(row["companies"]) for row in rows)
+    print(f"Theme: {len(rows)} nodes merged, up to {edge_count} BELONGS_TO edges")
+
 
 async def seed():
     await neo4j_database.init_driver()
@@ -119,3 +168,5 @@ async def seed():
     await seed_countries()
     await seed_krx_companies()
     await seed_us_companies()
+    # Themes reference companies by ticker, so they are seeded last
+    await seed_themes()
