@@ -45,11 +45,17 @@ def build_alias_processor(categories: list[dict]) -> KeywordProcessor:
 
 
 def match_category(processor: KeywordProcessor, item_text: str) -> str | None:
-    """Return the category of the longest alias found inside the item text."""
+    """Return the category of the longest alias found inside the item text.
+
+    Ties are broken by whichever match ends furthest right. Korean noun compounds put the
+    head noun last, so in "단결정 NCM 양극재" the trailing "양극재" names what the item IS,
+    while the leading "NCM" only qualifies it. Without this rule the winner would depend on
+    the accident of which alias appears first in the string.
+    """
     spans = processor.extract_keywords(item_text, span_info=True)
     if not spans:
         return None
-    category_id, start, end = max(spans, key=lambda span: span[2] - span[1])
+    category_id, _start, _end = max(spans, key=lambda span: (span[2] - span[1], span[2]))
     return category_id
 
 

@@ -23,6 +23,14 @@ _CATEGORIES = [
         "aliases": ["증착 장비"],
         "learned_aliases": ["차세대 증착 장비"],
     },
+    {
+        "id": "배터리 셀",
+        "domain": "2차전지",
+        "kind": "제품",
+        "definition": "완성된 배터리 셀.",
+        "aliases": ["NCM"],
+        "learned_aliases": [],
+    },
 ]
 
 
@@ -51,6 +59,15 @@ def test_longest_alias_wins():
 
     # Both "양극재" and "하이니켈 양극재" are aliases; the longer span must win.
     assert match_category(processor, "하이니켈 양극재") == "양극재"
+
+
+def test_equal_length_ties_go_to_the_rightmost_match():
+    processor = build_alias_processor(_CATEGORIES)
+
+    # "NCM" (배터리 셀) and "양극재" (양극재) are both 3-character aliases found in this
+    # phrase, so their spans tie on length. The qualifier "NCM" appears first, but the head
+    # noun "양극재" appears last and names what the item actually is; it must win the tie.
+    assert match_category(processor, "단결정 NCM 양극재") == "양극재"
 
 
 def test_learned_alias_is_a_cache_hit():
