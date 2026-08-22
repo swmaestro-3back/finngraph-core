@@ -1,4 +1,4 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_aws import ChatBedrockConverse
 
 from app.core.config import settings
 from app.graph.models import (
@@ -80,10 +80,10 @@ def build_candidate_frames(
 
 class RelationExtractor:
     def __init__(self):
-        self._model = ChatGoogleGenerativeAI(
-            model=settings.GEMINI_MODEL,
+        self._model = ChatBedrockConverse(
+            model=settings.bedrock_chat_model,
+            region_name=settings.bedrock_region,
             temperature=0,
-            google_api_key=settings.GOOGLE_API_KEY,
         )
 
         self._chain = PROMPT | self._model.with_structured_output(

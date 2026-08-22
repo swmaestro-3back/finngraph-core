@@ -27,8 +27,8 @@ class Neo4jDatabase:
             return
         try:
             self._driver = AsyncGraphDatabase.driver(
-                settings.NEO4J_URI,
-                auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD)
+                settings.neo4j_uri,
+                auth=(settings.neo4j_username, settings.neo4j_password)
             )
         except Exception as e:
             print(f"Error occurred while initializing Neo4j driver: {e}")
@@ -41,7 +41,7 @@ class Neo4jDatabase:
         records, _, _ = await self._driver.execute_query(
             query,
             parameters_=parameters,
-            database_=settings.NEO4J_DATABASE
+            database_=settings.neo4j_database
         )
 
         # execute_query returns (records, summary, keys); only records are needed here

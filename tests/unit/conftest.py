@@ -8,8 +8,8 @@ import time, so a missing variable breaks the import itself. Existing values are
 import os
 
 _DUMMY_ENV = {
-    "GEMINI_MODEL": "gemini-test",
-    "GOOGLE_API_KEY": "test-key",
+    "BEDROCK_REGION": "us-east-1",
+    "BEDROCK_CHAT_MODEL": "bedrock-test-model",
     "NEO4J_URI": "bolt://localhost:7687",
     "NEO4J_USERNAME": "neo4j",
     "NEO4J_PASSWORD": "password",
