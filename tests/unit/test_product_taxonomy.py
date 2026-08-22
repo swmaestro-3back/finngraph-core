@@ -1,0 +1,65 @@
+import json
+from pathlib import Path
+
+from app.graph.ontology.product_taxonomy import (
+    TAXONOMY_PATH,
+    all_aliases,
+    load_taxonomy,
+)
+
+_LEGACY = Path("data/seed/legacy_product_dict.json")
+_MAPPING = Path("data/seed/canonical_to_category.json")
+
+_REQUIRED_FIELDS = {"id", "domain", "kind", "definition", "aliases", "learned_aliases"}
+
+
+def test_every_category_has_all_required_fields():
+    for category in load_taxonomy():
+        assert _REQUIRED_FIELDS <= set(category), category.get("id")
+        assert category["definition"].strip(), category["id"]
+
+
+def test_category_ids_are_unique():
+    ids = [category["id"] for category in load_taxonomy()]
+    assert len(ids) == len(set(ids))
+
+
+def test_an_alias_belongs_to_exactly_one_category():
+    owner_by_alias: dict[str, str] = {}
+    for category in load_taxonomy():
+        for alias in all_aliases(category):
+            assert alias not in owner_by_alias, (
+                f"{alias!r} claimed by both {owner_by_alias.get(alias)} and {category['id']}"
+            )
+            owner_by_alias[alias] = category["id"]
+
+
+def test_every_legacy_canonical_is_mapped_to_a_live_category():
+    legacy = json.loads(_LEGACY.read_text(encoding="utf-8"))
+    mapping = json.loads(_MAPPING.read_text(encoding="utf-8"))
+    category_ids = {category["id"] for category in load_taxonomy()}
+
+    canonicals = set(legacy["product"]) | set(legacy["commodity"])
+    unmapped = canonicals - set(mapping)
+    assert not unmapped, f"unmapped canonicals: {sorted(unmapped)}"
+
+    unknown_targets = set(mapping.values()) - category_ids
+    assert not unknown_targets, f"mapping points at unknown categories: {sorted(unknown_targets)}"
+
+
+def test_every_legacy_surface_form_is_reachable_as_an_alias():
+    """The dictionaries were deleted; their surface forms must survive as aliases."""
+    legacy = json.loads(_LEGACY.read_text(encoding="utf-8"))
+    known = {alias for category in load_taxonomy() for alias in all_aliases(category)}
+
+    missing = []
+    for section in ("product", "commodity"):
+        for canonical, surfaces in legacy[section].items():
+            for surface in [canonical, *surfaces]:
+                if surface not in known:
+                    missing.append(surface)
+    assert not missing, f"{len(missing)} surface forms lost, e.g. {missing[:10]}"
+
+
+def test_taxonomy_path_points_at_the_seed_file():
+    assert TAXONOMY_PATH == Path("data/seed/product_taxonomy.json").resolve()
