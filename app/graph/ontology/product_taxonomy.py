@@ -44,8 +44,17 @@ def all_aliases(category: dict) -> list[str]:
 def append_learned_aliases(mapping: dict[str, str], path: Path | None = None) -> None:
     """Record {item_text: category_id} pairs so the next run resolves them without an LLM.
 
-    Unknown category ids and aliases already present are skipped rather than raising: this
-    runs inside the pipeline and must never take the run down.
+    Unknown category ids, unsafe aliases, and aliases already present are skipped rather than
+    raising: this runs inside the pipeline and must never take the run down.
+
+    The dedup set here is built from the raw ``aliases``/``learned_aliases`` fields rather than
+    ``all_aliases()``: that function answers "what may be matched", filtering unsafe entries out
+    so they never resolve an item, but this write path needs "what is already stored" so it can
+    detect duplicates in the file as it actually is. Using ``all_aliases()`` here would make an
+    unsafe alias permanently invisible to the dedup check, so the LLM would re-append it to
+    ``learned_aliases`` on every run that reclassifies it, growing the file without bound. An
+    unsafe alias must never be written back at all — the deny-list stays the single place this
+    decision lives.
     """
     target = path or TAXONOMY_PATH
     payload = json.loads(target.read_text(encoding="utf-8"))
@@ -53,13 +62,13 @@ def append_learned_aliases(mapping: dict[str, str], path: Path | None = None) ->
     known = {
         alias
         for category in payload["categories"]
-        for alias in all_aliases(category)
+        for alias in (*category["aliases"], *category["learned_aliases"])
     }
 
     changed = False
     for item_text, category_id in mapping.items():
         category = by_id.get(category_id)
-        if category is None or item_text in known:
+        if category is None or item_text in known or item_text in UNSAFE_ALIASES:
             continue
         category["learned_aliases"].append(item_text)
         known.add(item_text)

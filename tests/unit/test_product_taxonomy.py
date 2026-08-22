@@ -5,6 +5,7 @@ from app.graph.ontology.product_taxonomy import (
     TAXONOMY_PATH,
     UNSAFE_ALIASES,
     all_aliases,
+    append_learned_aliases,
     load_taxonomy,
 )
 
@@ -68,3 +69,35 @@ def test_every_legacy_surface_form_is_reachable_as_an_alias():
 
 def test_taxonomy_path_points_at_the_seed_file():
     assert TAXONOMY_PATH == Path("data/seed/product_taxonomy.json").resolve()
+
+
+def test_unsafe_aliases_are_never_written_back(tmp_path):
+    """A deny-listed item_text must never be appended to learned_aliases, even if the LLM
+    classifies it: otherwise it would be re-appended on every subsequent run forever, since
+    the deny-list also hides it from the dedup check via all_aliases()."""
+    category_id = "농축산물"
+    payload = {
+        "categories": [
+            {
+                "id": category_id,
+                "domain": "농축산",
+                "kind": "제품",
+                "definition": "곡물 등 농축산 원자재.",
+                "aliases": ["대두박"],
+                "learned_aliases": [],
+            }
+        ]
+    }
+    target = tmp_path / "product_taxonomy.json"
+    target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    unsafe_alias = next(iter(UNSAFE_ALIASES))
+    append_learned_aliases(
+        {unsafe_alias: category_id, "카놀라유": category_id},
+        path=target,
+    )
+
+    written = json.loads(target.read_text(encoding="utf-8"))
+    learned = written["categories"][0]["learned_aliases"]
+    assert learned == ["카놀라유"]
+    assert unsafe_alias not in learned
