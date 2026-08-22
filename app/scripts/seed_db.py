@@ -28,6 +28,17 @@ async def create_constraints() -> None:
         """
     )
 
+    # COMPANY NAME — plain index, not a uniqueness constraint. crud.upsert_triplets MERGEs
+    # every node by name, so without an index each MERGE is a label scan over 3000+ nodes.
+    # A uniqueness constraint would be wrong here: names legitimately collide with the
+    # ticker-keyed seed nodes, and a constraint would make the first colliding write fail.
+    await neo4j_database.execute(
+        """
+        CREATE INDEX company_name_index IF NOT EXISTS
+        FOR (c:Company) ON (c.name)
+        """
+    )
+
     # THEME NAME
     await neo4j_database.execute(
         """
