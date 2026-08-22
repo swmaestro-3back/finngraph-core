@@ -1,21 +1,19 @@
 from flashtext import KeywordProcessor
 
-from app.graph.models import Entity, EntityLabel
-from app.graph.ontology.gazetteers import COUNTRY_DICT, COMMODITY_DICT, PRODUCT_DICT, COMPANY_DICT
+from app.graph.models import Entity
+from app.graph.ontology.gazetteers import COMPANY_DICT
 
-# Pre-built knowledge base dict
-GAZETTEERS: dict[EntityLabel, dict[str, list[str]]] = {
+# Pre-built knowledge base dict. Only companies are gazetteer-anchored; products are free
+# text extracted by the LLM and classified downstream by ProductLinker.
+GAZETTEERS: dict[str, dict[str, list[str]]] = {
     "COMPANY": COMPANY_DICT,
-    "COUNTRY": COUNTRY_DICT,
-    "PRODUCT": PRODUCT_DICT,
-    "COMMODITY": COMMODITY_DICT
 }
 
 class EntityExtractor:
     def __init__(self):
-    
+
         self._canonicalizer = KeywordProcessor(case_sensitive=True)
-        self._processors: dict[EntityLabel, KeywordProcessor] = {}
+        self._processors: dict[str, KeywordProcessor] = {}
 
         for label, gazetteer in GAZETTEERS.items():
             processor = KeywordProcessor(case_sensitive=True)
