@@ -181,3 +181,24 @@ class Triplet(BaseModel):
     evidence: str = Field(description="맥락이 복원된 자립적 근거 문장 (UI 노출용)")
     polarity: Polarity = Field(description="affirmed / denied / terminated")
     tense: Tense = Field(description="past_or_present_fact / future_or_planned / modal_possibility")
+
+
+# ==============================================================================
+# ProductLinker
+# ==============================================================================
+
+class RawItemCategory(BaseModel):
+    item_text: str = Field(description="Copy the item text back EXACTLY as given in the input list.")
+    category_id: Optional[str] = Field(
+        default=None,
+        description=(
+            "Must be one of the category ids in the provided list, or null when none of them "
+            "fits. Never invent a new category name."
+        ),
+    )
+
+
+class RawItemCategoryList(BaseModel):
+    items: List[RawItemCategory] = Field(
+        description="One entry per input item, in the same order as the input list."
+    )

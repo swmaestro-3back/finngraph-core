@@ -6,6 +6,7 @@ from app.graph.state import GraphState
 from app.graph.models import Entity
 from app.graph.nodes.relation_extractor import RelationExtractor
 from app.graph.nodes.frame_annotator import FrameAnnotator
+from app.graph.nodes.product_linker import ProductLinker
 from app.graph.nodes.triplet_builder import TripletBuilder
 from app.graph.nodes.entity_extractor import EntityExtractor
 
@@ -28,11 +29,13 @@ class GraphRunner:
         self._entity_extractor = EntityExtractor()
         self._relation_extractor = RelationExtractor()
         self._frame_annotator = FrameAnnotator()
+        self._product_linker = ProductLinker()
         self._triplet_builder = TripletBuilder()
         self._graph = self._compile_graph(
             self._entity_extractor,
             self._relation_extractor,
             self._frame_annotator,
+            self._product_linker,
             self._triplet_builder,
         )
 
@@ -41,6 +44,7 @@ class GraphRunner:
         entity_extractor: EntityExtractor,
         relation_extractor: RelationExtractor,
         frame_annotator: FrameAnnotator,
+        product_linker: ProductLinker,
         triplet_builder: TripletBuilder,
     ):
 
@@ -83,6 +87,13 @@ class GraphRunner:
                 "annotation_stats": annotation_stats,
             }
 
+        async def link_products(state: GraphState) -> dict:
+            """Attach a taxonomy category to each free-text product mention."""
+            linked_frames, linking_stats = await product_linker.link(
+                state["annotated_frames"], state["news_id"]
+            )
+            return {"annotated_frames": linked_frames, "linking_stats": linking_stats}
+
         async def build_triplets(state: GraphState) -> dict:
             annotated_frames = state["annotated_frames"]
             return {
@@ -99,6 +110,7 @@ class GraphRunner:
         workflow.add_node("extract_entities", extract_entities)
         workflow.add_node("extract_relations", extract_relations)
         workflow.add_node("annotate_frames", annotate_frames)
+        workflow.add_node("link_products", link_products)
         workflow.add_node("build_triplets", build_triplets)
 
         workflow.set_entry_point("canonicalize_article")
@@ -106,7 +118,8 @@ class GraphRunner:
         workflow.add_edge("canonicalize_article", "extract_entities")
         workflow.add_edge("extract_entities", "extract_relations")
         workflow.add_edge("extract_relations", "annotate_frames")
-        workflow.add_edge("annotate_frames", "build_triplets")
+        workflow.add_edge("annotate_frames", "link_products")
+        workflow.add_edge("link_products", "build_triplets")
         workflow.add_edge("build_triplets", END)
 
         return workflow.compile()

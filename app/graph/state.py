@@ -15,5 +15,6 @@ class GraphState(TypedDict, total=False):
     candidate_frames: list[CandidateFrame]   # Result of RelationExtractor
     annotated_frames: list[RelationFrame]    # Result of FrameAnnotator
     annotation_stats: dict
+    linking_stats: dict                 # Result of ProductLinker
     triplets: list[Triplet]             # Result of TripletBuilder
     triplet_stats: dict
