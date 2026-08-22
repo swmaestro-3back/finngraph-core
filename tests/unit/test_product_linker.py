@@ -1,10 +1,12 @@
-from app.graph.models import Entity, ProductRef, RelationFrame
+from app.graph.models import Entity, ProductRef, RawItemCategory, RelationFrame
 from app.graph.nodes.product_linker import (
     apply_categories,
     build_alias_processor,
+    filter_echoed_entries,
     match_category,
     pending_items,
 )
+from app.graph.ontology.product_taxonomy import load_taxonomy
 
 _CATEGORIES = [
     {
@@ -114,3 +116,32 @@ def test_apply_categories_leaves_itemless_frames_alone():
     linked = apply_categories([_frame(None)], {"양극재": "양극재"})
 
     assert linked[0].item is None
+
+
+def test_llm_entries_not_echoed_from_the_input_are_ignored():
+    """If the model normalises or trims its echo, the phantom item_text must not be accepted:
+    it would otherwise get written into learned_aliases permanently while the real item is
+    logged unclassified."""
+    entries = [
+        RawItemCategory(item_text="양극재", category_id="양극재"),  # sent, known category
+        RawItemCategory(item_text="양극재 ", category_id="양극재"),  # drifted echo (trailing space)
+        RawItemCategory(item_text="2층 전동차 개조작업", category_id="없는 카테고리"),  # sent, unknown category
+    ]
+
+    learned = filter_echoed_entries(
+        entries,
+        pending_texts={"양극재", "2층 전동차 개조작업"},
+        category_ids={"양극재", "반도체 장비", "배터리 셀"},
+    )
+
+    assert learned == {"양극재": "양극재"}
+
+
+def test_unsafe_aliases_never_reach_the_processor():
+    """Deny-listed aliases like "밀" and "요소" must not match as substrings inside unrelated
+    words ("정밀", "핵심 요소 부품"). Built from the real taxonomy so this exercises the actual
+    seed data, not a synthetic fixture."""
+    processor = build_alias_processor(load_taxonomy())
+
+    assert match_category(processor, "초정밀 감속기") is None
+    assert match_category(processor, "핵심 요소 부품") is None

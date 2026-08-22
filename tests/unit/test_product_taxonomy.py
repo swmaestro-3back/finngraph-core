@@ -3,6 +3,7 @@ from pathlib import Path
 
 from app.graph.ontology.product_taxonomy import (
     TAXONOMY_PATH,
+    UNSAFE_ALIASES,
     all_aliases,
     load_taxonomy,
 )
@@ -48,7 +49,11 @@ def test_every_legacy_canonical_is_mapped_to_a_live_category():
 
 
 def test_every_legacy_surface_form_is_reachable_as_an_alias():
-    """The dictionaries were deleted; their surface forms must survive as aliases."""
+    """The dictionaries were deleted; their surface forms must survive as aliases.
+
+    Forms in UNSAFE_ALIASES are exempt: they were dropped on purpose because they match as
+    substrings inside unrelated words, not lost by accident.
+    """
     legacy = json.loads(_LEGACY.read_text(encoding="utf-8"))
     known = {alias for category in load_taxonomy() for alias in all_aliases(category)}
 
@@ -56,7 +61,7 @@ def test_every_legacy_surface_form_is_reachable_as_an_alias():
     for section in ("product", "commodity"):
         for canonical, surfaces in legacy[section].items():
             for surface in [canonical, *surfaces]:
-                if surface not in known:
+                if surface not in known and surface not in UNSAFE_ALIASES:
                     missing.append(surface)
     assert not missing, f"{len(missing)} surface forms lost, e.g. {missing[:10]}"
 

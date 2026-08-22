@@ -18,7 +18,7 @@ from flashtext import KeywordProcessor
 from langchain_aws import ChatBedrockConverse
 
 from app.core.config import settings
-from app.graph.models import ProductRef, RawItemCategoryList, RelationFrame
+from app.graph.models import ProductRef, RawItemCategoryList, RawItemCategory, RelationFrame
 from app.graph.ontology.product_taxonomy import (
     all_aliases,
     append_learned_aliases,
@@ -79,6 +79,27 @@ def pending_items(
             resolved[frame.item.text] = category_id
 
     return resolved, unresolved
+
+
+def filter_echoed_entries(
+    entries: list[RawItemCategory],
+    pending_texts: set[str],
+    category_ids: set[str],
+) -> dict[str, str]:
+    """Return {item_text: category_id} for entries that pass both guardrails.
+
+    The category list is closed, so an unknown id is a hallucination, and an item_text we
+    never sent means the model's echo drifted (normalised, trimmed, or otherwise rewritten).
+    Accepting either would write a phantom string into learned_aliases permanently while the
+    real item is logged unclassified.
+    """
+    learned: dict[str, str] = {}
+    for entry in entries:
+        if entry.item_text not in pending_texts:
+            continue
+        if entry.category_id in category_ids:
+            learned[entry.item_text] = entry.category_id
+    return learned
 
 
 def apply_categories(
@@ -170,14 +191,15 @@ class ProductLinker:
                     "items": format_items(unresolved),
                 }
             )
-            learned: dict[str, str] = {}
-            for entry in result.items:
-                # Guardrail: the category list is closed, so an unknown id is a hallucination.
-                if entry.category_id in self._category_ids:
-                    learned[entry.item_text] = entry.category_id
+            pending_texts = {item_text for item_text, _ in unresolved}
+            learned = filter_echoed_entries(result.items, pending_texts, self._category_ids)
 
             resolved.update(learned)
             append_learned_aliases(learned)
+            # Register on the live processor too, so a repeated item text within this same
+            # batch run resolves by alias instead of paying for another LLM call.
+            for item_text, category_id in learned.items():
+                self._processor.add_keyword(item_text, category_id)
             stats["linked_by_llm"] = len(learned)
 
             still_unknown = [pair for pair in unresolved if pair[0] not in resolved]
