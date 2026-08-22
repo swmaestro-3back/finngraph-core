@@ -104,7 +104,7 @@ class CandidateFrame(BaseModel):
     object: Entity = Field(description="Must exactly match an entity from the provided NER results.")
     item: ProductRef | None = Field(
         default=None,
-        description="Only set for predicates with a third 'item' argument in PREDICATE_DICT_NARY.",
+        description="Only set for predicates with a third 'item' argument in PREDICATE_DICT.",
     )
     predicate: str = Field(
         description="Must be strictly selected from the registered_predicates list."

@@ -8,8 +8,8 @@ from app.graph.ontology.predicate_dict import PREDICATE_DICT
 _PREDICATE_DICT: dict = PREDICATE_DICT
 
 # Render each predicate with its description and per-argument roles rather than the bare name.
-# Type constraints alone cannot separate near-synonyms that differ only in direction
-# (ACQUIRES vs DIVESTS_FROM, PRODUCES vs DEVELOPS), so the role text carries that distinction.
+# Type constraints alone cannot separate near-synonyms that differ only in degree of control
+# (INVESTS_IN vs ACQUIRES), so the role text carries that distinction.
 # Three-argument predicates show the item role separately and expose the dictionary's required
 # flag as [mandatory] or [optional], which tells the model whether a frame missing an item
 # should be dropped or extracted anyway.
