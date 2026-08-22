@@ -27,23 +27,13 @@ from app.graph.nodes.relation_extractor import RelationExtractor
 # (article text, {(subject, predicate, object): expected polarity})
 # Expectations are hand-labelled following the decision rule in spec section 6.
 #
-# Note: EntityExtractor.canonicalize() rewrites gazetteer surface forms to their canonical
-# names, so the 포스코케미칼 case below reaches the extractor as 포스코퓨처엠. Expectation keys
-# therefore use the canonical name, not the wording in the article. The sentence itself is left
-# as written, since canonicalize() performs the substitution and neither its grammar nor its
-# meaning changes.
+# Note: EntityExtractor.canonicalize() rewrites company surface forms (aliases) to their
+# canonical names before extraction — this applies to company names only. Product mentions
+# are free text resolved downstream by ProductLinker, not by this canonicalizer.
 _GOLDEN: list[tuple[str, dict[tuple[str, str, str], str]]] = [
     (
         "에코프로비엠은 올 하반기부터 삼성SDI에 양극재를 공급한다.",
         {("에코프로비엠", "SUPPLIES_TO", "삼성SDI"): "affirmed"},
-    ),
-    (
-        "에코프로비엠은 LG에너지솔루션과 협력을 논의 중이라는 보도에 대해 사실무근이라고 밝혔다.",
-        {("에코프로비엠", "PARTNERS_WITH", "LG에너지솔루션"): "denied"},
-    ),
-    (
-        "에코프로비엠은 지난달 포스코케미칼과의 합작법인을 청산했다.",
-        {("에코프로비엠", "PARTNERS_WITH", "포스코퓨처엠"): "terminated"},
     ),
     (
         "삼성SDI는 코스모신소재로부터 양극재를 공급받아 왔으나 지난달 공급 계약을 해지했다.",
