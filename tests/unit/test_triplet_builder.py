@@ -1,12 +1,12 @@
-from app.graph.models import Entity, RelationFrame
+from app.graph.models import Entity, ProductRef, RelationFrame
 from app.graph.nodes.triplet_builder import TripletBuilder
 
 
 def _frame(**overrides) -> RelationFrame:
     base = {
-        "subject": Entity(text="에코프로비엠", label="COMPANY"),
-        "object": Entity(text="삼성SDI", label="COMPANY"),
-        "item": Entity(text="양극재", label="COMMODITY"),
+        "subject": Entity(text="에코프로비엠"),
+        "object": Entity(text="삼성SDI"),
+        "item": ProductRef(text="하이니켈 양극재"),
         "predicate": "SUPPLIES_TO",
         "source_sentence": "에코프로비엠은 삼성SDI에 양극재를 공급한다.",
         "clause": "에코프로비엠은 삼성SDI에 양극재를 공급한다.",
@@ -52,13 +52,20 @@ def test_unregistered_predicate_is_still_dropped():
     assert builder.build([_frame(predicate="NOT_A_PREDICATE")]) == []
 
 
-def test_subject_type_violation_is_still_dropped():
+def test_item_is_carried_through_untouched():
     builder = TripletBuilder()
 
-    # SUPPLIES_TO only allows COMPANY as its supplier
-    frame = _frame(subject=Entity(text="미국", label="COUNTRY"))
+    triplet = builder.build([_frame()])[0]
 
-    assert builder.build([frame]) == []
+    assert triplet.item == ProductRef(text="하이니켈 양극재", category=None)
+
+
+def test_category_survives_the_conversion():
+    builder = TripletBuilder()
+
+    frame = _frame(item=ProductRef(text="하이니켈 양극재", category="양극재"))
+
+    assert builder.build([frame])[0].item.category == "양극재"
 
 
 def test_frames_differing_only_in_polarity_are_both_kept():

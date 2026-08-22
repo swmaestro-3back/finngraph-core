@@ -57,13 +57,12 @@ class GraphRunner:
                 entity_extractor.extract, state["article"]
             )
 
-            seen: set[tuple[str, str]] = set()
+            seen: set[str] = set()
             deduped: list[Entity] = []
             for entity in gazetteer_entities:
-                key = (entity.text, entity.label)
-                if key in seen:
+                if entity.text in seen:
                     continue
-                seen.add(key)
+                seen.add(entity.text)
                 deduped.append(entity)
             return {"entities": deduped}
 

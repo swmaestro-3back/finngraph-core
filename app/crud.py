@@ -2,18 +2,10 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import get_args
 
 from app.core.db import neo4j_database
-from app.graph.models import EntityLabel, Triplet
+from app.graph.models import Triplet
 from app.graph.ontology.predicate_dict import PREDICATE_DICT
-
-# Map NER tags to Neo4j labels (COMPANY -> Company, COUNTRY -> Country)
-# (COMPANY → Company, COUNTRY → Country)
-_TYPE_TO_LABEL: dict[EntityLabel, str] = {
-    label: "".join(part.capitalize() for part in label.split("_"))
-    for label in get_args(EntityLabel)
-}
 
 # Predicates whose triplet is split into two edges through the item node
 _ITEM_DECOMPOSITION: dict[str, tuple[str, str]] = {
@@ -34,9 +26,8 @@ def _edge_specs(triplet: Triplet) -> list[tuple[str, str, str, str, str]]:
     object of the first edge and the subject of the second.
     """
 
-    # Convert NER labels to Neo4j labels
-    subject_label = _TYPE_TO_LABEL[triplet.subject.label]
-    object_label = _TYPE_TO_LABEL[triplet.object.label]
+    subject_label = "Company"
+    object_label = "Company"
 
     if triplet.item is None:
         # The predicate is already whitelisted upstream, but it is interpolated straight into
@@ -52,7 +43,7 @@ def _edge_specs(triplet: Triplet) -> list[tuple[str, str, str, str, str]]:
             return []
         return [(subject_label, triplet.subject.text, triplet.predicate, object_label, triplet.object.text)]
 
-    item_label = _TYPE_TO_LABEL[triplet.item.label]
+    item_label = "Product"
     rel_subject_item, rel_item_object = decomposition
     return [
         (subject_label, triplet.subject.text, rel_subject_item, item_label, triplet.item.text),

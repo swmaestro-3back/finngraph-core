@@ -4,12 +4,29 @@ from app.core.config import settings
 from app.graph.models import (
     CandidateFrame,
     Entity,
+    ProductRef,
     RawRelation,
     RawRelationList,
 )
-from app.graph.ontology.predicate_dict import REGISTERED_PREDICATES
+from app.graph.ontology.predicate_dict import PREDICATE_DICT, REGISTERED_PREDICATES
 from app.graph.prompts.relation_extraction import PROMPT
 from app.graph.utils.text import normalize_whitespace
+
+
+def _product_item_slot(predicate: str) -> dict | None:
+    """Return the item argument spec when the predicate declares a product slot.
+
+    Slot kind is derived from the ontology rather than hardcoded, so adding a predicate
+    with an item argument later needs no change here.
+    """
+    entry = PREDICATE_DICT.get(predicate)
+    if entry is None:
+        return None
+    arguments = list(entry["arguments"].values())
+    if len(arguments) < 3:
+        return None
+    item_argument = arguments[2]
+    return item_argument if item_argument["types"] == ["PRODUCT"] else None
 
 
 def build_candidate_frames(
@@ -23,9 +40,8 @@ def build_candidate_frames(
     Pure function, kept apart from the LLM call so it can be unit tested without an API key
     """
 
-    # Lookup table for grounding: the only source of truth for whether a subject/object/item
-    # string exists in the NER output, and which label it carries.
-    entity_label_by_text = {e.text.strip(): e.label for e in entities}
+    # Anchor slots are the only ones checked against NER output. Product slots are free text.
+    entity_texts = {entity.text.strip() for entity in entities}
     normalized_text = normalize_whitespace(text)
 
     frames: list[CandidateFrame] = []
@@ -35,17 +51,21 @@ def build_candidate_frames(
             continue
 
         # Discard if subject or object is not in extracted entities
-        subject_label = entity_label_by_text.get(raw_frame.subject.strip())
-        object_label = entity_label_by_text.get(raw_frame.object.strip())
-        if subject_label is None or object_label is None:
+        subject_text = raw_frame.subject.strip()
+        object_text = raw_frame.object.strip()
+        if subject_text not in entity_texts or object_text not in entity_texts:
             continue
 
-        # Discard item if not in extracted entities
-        item_entity: Entity | None = None
-        if raw_frame.item is not None:
-            item_label = entity_label_by_text.get(raw_frame.item.strip())
-            if item_label is not None:
-                item_entity = Entity(text=raw_frame.item.strip(), label=item_label)
+        # Product slot: accept any span the article actually contains. The substring check is
+        # the only defence against an invented item, since there is no dictionary to match.
+        item_ref: ProductRef | None = None
+        item_slot = _product_item_slot(raw_frame.predicate)
+        if item_slot is not None:
+            item_text = (raw_frame.item or "").strip()
+            if item_text and normalize_whitespace(item_text) in normalized_text:
+                item_ref = ProductRef(text=item_text)
+            if item_slot["required"] and item_ref is None:
+                continue
 
         # Discard if source_sentence is not in the article
         source_sentence = raw_frame.source_sentence.strip()
@@ -57,9 +77,9 @@ def build_candidate_frames(
         frames.append(
             CandidateFrame(
                 predicate=raw_frame.predicate,
-                subject=Entity(text=raw_frame.subject.strip(), label=subject_label),
-                object=Entity(text=raw_frame.object.strip(), label=object_label),
-                item=item_entity,
+                subject=Entity(text=subject_text),
+                object=Entity(text=object_text),
+                item=item_ref,
                 source_sentence=source_sentence,
                 clause=clause,
             )
@@ -99,7 +119,7 @@ class RelationExtractor:
         """
         Extract relation candidates from the article
         """
-        entity_lines = [f"- {e.text} ({e.label})" for e in entities]
+        entity_lines = [f"- {entity.text}" for entity in entities]
         entities_str = "\n".join(entity_lines) if entity_lines else "없음"
 
         # The predicate dictionary and few-shot examples already live in PROMPT's fixed system

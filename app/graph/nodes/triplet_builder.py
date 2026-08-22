@@ -1,6 +1,6 @@
 from typing import get_args
 
-from app.graph.models import Entity, Polarity, RelationFrame, Tense, Triplet
+from app.graph.models import Polarity, RelationFrame, Tense, Triplet
 from app.graph.ontology.predicate_dict import PREDICATE_DICT
 
 
@@ -27,43 +27,22 @@ class TripletBuilder:
 
     def _to_triplet(self, frame: RelationFrame) -> Triplet | None:
         """
-        Convert one frame to a triplet, or None if the ontology rejects it
+        Convert one frame to a triplet, or None if the predicate is not registered
+
+        Argument type validation used to live here. With a single anchor kind (COMPANY) and a
+        free-text product slot, every check was vacuously true, so it was removed rather than
+        left as code that reads like a guard but guards nothing.
         """
         # Polarity is deliberately not filtered here. A denied or terminated relation keeps its
         # edge and is distinguished by its label, so the UI can show the full history.
-
-        # Reject unregistered predicates
-        entry = self._predicate_dict.get(frame.predicate)
-        if entry is None:
+        if frame.predicate not in self._predicate_dict:
             return None
-
-        # Arguments in PREDICATE_DICT_NARY are ordered by role (subject, object, optional item)
-        arg_names = list(entry["arguments"].keys())
-        agent_key, counterparty_key = arg_names[0], arg_names[1]
-        item_key = arg_names[2] if len(arg_names) > 2 else None
-
-        # Validate subject entity type (empty type list means unrestricted)
-        agent_types = entry["arguments"][agent_key]["types"]
-        if agent_types and frame.subject.label not in agent_types:
-            return None
-
-        # Validate object entity type
-        counterparty_types = entry["arguments"][counterparty_key]["types"]
-        if counterparty_types and frame.object.label not in counterparty_types:
-            return None
-
-        # Item is optional: clear it on type mismatch instead of dropping the entire frame
-        item: Entity | None = None
-        if item_key is not None and frame.item is not None:
-            item_types = entry["arguments"][item_key]["types"]
-            if not item_types or frame.item.label in item_types:
-                item = frame.item
 
         return Triplet(
             subject=frame.subject,
             predicate=frame.predicate,
             object=frame.object,
-            item=item,
+            item=frame.item,
             source_sentence=frame.source_sentence,
             evidence=frame.evidence,
             polarity=frame.polarity,

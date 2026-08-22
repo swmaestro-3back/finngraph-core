@@ -32,7 +32,7 @@ class EntityExtractor:
         Extract entities using gazetteer
         """
         entities: list[Entity] = []
-        for label, processor in self._processors.items():
+        for processor in self._processors.values():
             for canonical in processor.extract_keywords(text):
-                entities.append(Entity(text=canonical, label=label))
+                entities.append(Entity(text=canonical))
         return entities

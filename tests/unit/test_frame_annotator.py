@@ -1,16 +1,16 @@
-from app.graph.models import CandidateFrame, Entity, RawAnnotation
+from app.graph.models import CandidateFrame, Entity, ProductRef, RawAnnotation
 from app.graph.nodes.frame_annotator import format_candidates, merge_annotations
 
 _CANDIDATE = CandidateFrame(
-    subject=Entity(text="에코프로비엠", label="COMPANY"),
-    object=Entity(text="삼성SDI", label="COMPANY"),
-    item=Entity(text="양극재", label="COMMODITY"),
+    subject=Entity(text="에코프로비엠"),
+    object=Entity(text="삼성SDI"),
+    item=ProductRef(text="하이니켈 양극재"),
     predicate="SUPPLIES_TO",
-    source_sentence="이 회사는 올 하반기부터 삼성SDI에 양극재를 공급한다.",
-    clause="에코프로비엠은 삼성SDI에 양극재를 공급한다.",
+    source_sentence="이 회사는 올 하반기부터 삼성SDI에 하이니켈 양극재를 공급한다.",
+    clause="에코프로비엠은 삼성SDI에 하이니켈 양극재를 공급한다.",
 )
 
-_EVIDENCE = "에코프로비엠은 올 하반기부터 삼성SDI에 양극재를 공급한다."
+_EVIDENCE = "에코프로비엠은 올 하반기부터 삼성SDI에 하이니켈 양극재를 공급한다."
 
 
 def _annotation(**overrides) -> RawAnnotation:
@@ -101,7 +101,7 @@ def test_too_long_evidence_is_dropped():
 def test_evidence_grounding_ignores_whitespace():
     frames, _ = merge_annotations(
         [_CANDIDATE],
-        [_annotation(evidence="에코프로비엠 은 올 하반기부터 삼성 SDI 에 양극재 를 공급한다.")],
+        [_annotation(evidence="에코프로비엠 은 올 하반기부터 삼성 SDI 에 하이니켈 양극재 를 공급한다.")],
     )
 
     assert len(frames) == 1
@@ -109,8 +109,8 @@ def test_evidence_grounding_ignores_whitespace():
 
 def test_annotations_are_matched_by_index_not_order():
     second = CandidateFrame(
-        subject=Entity(text="에코프로비엠", label="COMPANY"),
-        object=Entity(text="포스코케미칼", label="COMPANY"),
+        subject=Entity(text="에코프로비엠"),
+        object=Entity(text="포스코케미칼"),
         item=None,
         predicate="PARTNERS_WITH",
         source_sentence="에코프로비엠은 지난달 포스코케미칼과의 합작법인을 청산했다.",

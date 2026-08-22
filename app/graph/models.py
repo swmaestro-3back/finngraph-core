@@ -8,11 +8,6 @@ from pydantic import BaseModel, Field
 # Literals
 # ==============================================================================
 
-EntityLabel = Literal[
-    "COMPANY", "GOVERNMENT", "COUNTRY",
-    "COMMODITY", "PRODUCT",
-]
-
 # Temporal and modal status of a relation (UI labels: 확정 / 예정 / 관측).
 # Modality is the stance the text takes: fact, conjecture, possibility, intent.
 Tense = Literal[
@@ -35,8 +30,22 @@ Polarity = Literal[
 # ==============================================================================
 
 class Entity(BaseModel):
-    text: str = Field(description="개체명 표면형")
-    label: EntityLabel = Field(description="개체명 태그")
+    """An anchor-slot value: a company that matched the gazetteer."""
+
+    text: str = Field(description="기업 표면형 (gazetteer canonical)")
+
+
+class ProductRef(BaseModel):
+    """A product-slot value: free text copied from the article, classified later.
+
+    ``text`` is what the article said; ``category`` is the taxonomy id ProductLinker
+    assigns. The category is what rolls up in the graph, the text is what is preserved.
+    """
+
+    text: str = Field(description="원문 품목 구 (예: 'HBM3E 12단')")
+    category: str | None = Field(
+        default=None, description="ProductLinker가 부여한 카테고리 id (미분류면 None)"
+    )
 
 
 # ==============================================================================
@@ -93,7 +102,7 @@ class CandidateFrame(BaseModel):
     # This holds datas that needs to be processed by FrameAnnotator
     subject: Entity = Field(description="Must exactly match an entity from the provided NER results.")
     object: Entity = Field(description="Must exactly match an entity from the provided NER results.")
-    item: Entity | None = Field(
+    item: ProductRef | None = Field(
         default=None,
         description="Only set for predicates with a third 'item' argument in PREDICATE_DICT_NARY.",
     )
@@ -167,7 +176,7 @@ class Triplet(BaseModel):
     subject: Entity = Field(description="주체")
     predicate: str = Field(description="술어 원형")
     object: Entity = Field(description="객체")
-    item: Entity | None = Field(default=None, description="품목 (3rd Argument가 필수적인 술어에서만 채워짐)")
+    item: ProductRef | None = Field(default=None, description="품목 (3rd Argument가 필수적인 술어에서만 채워짐)")
     source_sentence: str = Field(description="관계의 근거가 된 원문 문장 (provenance)")
     evidence: str = Field(description="맥락이 복원된 자립적 근거 문장 (UI 노출용)")
     polarity: Polarity = Field(description="affirmed / denied / terminated")
