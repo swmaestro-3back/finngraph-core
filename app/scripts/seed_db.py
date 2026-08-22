@@ -1,5 +1,5 @@
 """
-Load data/seed/{country,krx,us,themes}.json into Neo4j following docs/neo4j_schema.md
+Load data/seed/{krx,us,themes}.json into Neo4j following docs/neo4j_schema.md
 
 seed() is the entry point; app.main calls it when the database is empty.
 """
@@ -28,14 +28,6 @@ async def create_constraints() -> None:
         """
     )
 
-    # COUNTRY ISO_NUM
-    await neo4j_database.execute(
-        """
-        CREATE CONSTRAINT country_iso_num_unique IF NOT EXISTS
-        FOR (c:Country) REQUIRE c.iso_num IS UNIQUE
-        """
-    )
-    
     # THEME NAME
     await neo4j_database.execute(
         """
@@ -45,28 +37,6 @@ async def create_constraints() -> None:
     )
 
     print("Constraints created")
-
-
-async def seed_countries() -> None:
-    rows = [
-        {
-            "name": row["country_nm"],
-            "iso_alp2": row["country_iso_alp2"],
-            "iso_num": row["iso_num"],
-        }
-        for row in _load("country.json")
-        if row["iso_num"].strip()
-    ]
-
-    await neo4j_database.execute(
-        """
-        UNWIND $rows AS row
-        MERGE (c:Country {iso_num: row.iso_num})
-        SET c.name = row.name, c.iso_alp2 = row.iso_alp2
-        """,
-        {"rows": rows},
-    )
-    print(f"Country: {len(rows)} nodes merged")
 
 
 async def seed_krx_companies() -> None:
@@ -165,7 +135,6 @@ async def seed():
     # Constraints must exist before the seed rows are inserted
     await create_constraints()
 
-    await seed_countries()
     await seed_krx_companies()
     await seed_us_companies()
     # Themes reference companies by ticker, so they are seeded last
