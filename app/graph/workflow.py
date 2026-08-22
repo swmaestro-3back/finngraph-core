@@ -10,6 +10,19 @@ from app.graph.nodes.triplet_builder import TripletBuilder
 from app.graph.nodes.entity_extractor import EntityExtractor
 
 
+def merge_stats(triplet_stats: dict, annotation_stats: dict) -> dict:
+    """Merge TripletBuilder statistics with FrameAnnotator drop counts.
+
+    Drop counts are captured during annotation, whereas stats() only measures surviving frames.
+    Merging both is required to compute the drop rate.
+    """
+
+    merged = dict(triplet_stats)
+    merged["dropped_annotation_mismatch"] = annotation_stats.get("dropped_annotation_mismatch", 0)
+    merged["dropped_evidence_grounding"] = annotation_stats.get("dropped_evidence_grounding", 0)
+    return merged
+
+
 class GraphRunner:
     def __init__(self):
         self._entity_extractor = EntityExtractor()
@@ -70,18 +83,6 @@ class GraphRunner:
                 "annotated_frames": annotated_frames,
                 "annotation_stats": annotation_stats,
             }
-
-        def merge_stats(triplet_stats: dict, annotation_stats: dict) -> dict:
-            """Merge TripletBuilder statistics with FrameAnnotator drop counts.
-
-            Drop counts are captured during annotation, whereas stats() only measures surviving frames.
-            Merging both is required to compute the drop rate.
-            """
-
-            merged = dict(triplet_stats)
-            merged["dropped_annotation_mismatch"] = annotation_stats.get("dropped_annotation_mismatch", 0)
-            merged["dropped_evidence_grounding"] = annotation_stats.get("dropped_evidence_grounding", 0)
-            return merged
 
         async def build_triplets(state: GraphState) -> dict:
             annotated_frames = state["annotated_frames"]
