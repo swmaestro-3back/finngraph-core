@@ -1,4 +1,4 @@
-from app.crud import build_edge_rows
+from app.crud import _predicate_has_item_slot, build_edge_rows
 from app.graph.models import Entity, ProductRef, Triplet
 
 
@@ -72,6 +72,16 @@ def test_identical_rows_are_deduplicated():
 
     assert len(rows["SUPPLIES_TO"]) == 1
     assert rows["SUPPLIES_TO"][0]["item_texts"] == ["하이니켈 양극재"]
+
+
+def test_predicate_has_item_slot_is_derived_from_predicate_dict():
+    """SUPPLIES_TO declares a third PRODUCT argument; INVESTS_IN and ACQUIRES do not. The
+    item_texts/categories SET clauses in upsert_triplets are only emitted for predicates
+    where this returns True, so INVESTS_IN/ACQUIRES edges no longer get [] written onto them."""
+    assert _predicate_has_item_slot("SUPPLIES_TO") is True
+    assert _predicate_has_item_slot("INVESTS_IN") is False
+    assert _predicate_has_item_slot("ACQUIRES") is False
+    assert _predicate_has_item_slot("NOT_A_REAL_PREDICATE") is False
 
 
 def test_first_frame_owns_the_provenance_of_a_merged_edge():

@@ -15,6 +15,20 @@ _MAX_PROVENANCE = 10
 _MAX_ITEM_TEXTS = 20
 
 
+def _predicate_has_item_slot(predicate: str) -> bool:
+    """Return whether the predicate declares a third 'item' argument in PREDICATE_DICT.
+
+    Derived from the ontology rather than hardcoded to SUPPLIES_TO, the same way
+    relation_extractor._product_item_slot derives it: adding a predicate with an item
+    argument later needs no change here.
+    """
+    entry = PREDICATE_DICT.get(predicate)
+    if entry is None:
+        return False
+    arguments = list(entry["arguments"].values())
+    return len(arguments) >= 3 and arguments[2]["types"] == ["PRODUCT"]
+
+
 def build_edge_rows(triplets: list[Triplet]) -> dict[str, list[dict]]:
     """
     Group triplets into one row per (subject, predicate, object), keyed by predicate
@@ -86,6 +100,23 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
     # planner inserts an Eager between WITH and SET, evaluating is_dup for every row up front),
     # so duplicates within a batch are filtered by build_edge_rows instead.
     for predicate, rows in build_edge_rows(triplets).items():
+        # item_texts/categories belong only on predicates that declare a product item
+        # (SUPPLIES_TO today). Emitting them for INVESTS_IN/ACQUIRES would just write []
+        # onto every such edge, since those triplets never carry an item.
+        item_clause = (
+            """,
+                r.item_texts = reduce(
+                    acc = coalesce(r.item_texts, []), t IN row.item_texts |
+                    CASE
+                        WHEN t IN acc THEN acc
+                        WHEN size(acc) >= $max_item_texts THEN acc[1..] + t
+                        ELSE acc + t END),
+                r.categories = reduce(
+                    acc = coalesce(r.categories, []), c IN row.categories |
+                    CASE WHEN c IN acc THEN acc ELSE acc + c END)"""
+            if _predicate_has_item_slot(predicate)
+            else ""
+        )
         await neo4j_database.execute(
             f"""
             UNWIND $rows AS row
@@ -119,16 +150,7 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
                 r.mentioned_ats = CASE
                     WHEN is_dup THEN r.mentioned_ats
                     WHEN at_cap THEN r.mentioned_ats[1..] + date()
-                    ELSE coalesce(r.mentioned_ats, []) + date() END,
-                r.item_texts = reduce(
-                    acc = coalesce(r.item_texts, []), t IN row.item_texts |
-                    CASE
-                        WHEN t IN acc THEN acc
-                        WHEN size(acc) >= $max_item_texts THEN acc[1..] + t
-                        ELSE acc + t END),
-                r.categories = reduce(
-                    acc = coalesce(r.categories, []), c IN row.categories |
-                    CASE WHEN c IN acc THEN acc ELSE acc + c END)
+                    ELSE coalesce(r.mentioned_ats, []) + date() END{item_clause}
             """,
             {
                 "rows": rows,
