@@ -17,19 +17,22 @@ _MAX_ITEM_TEXTS = 20
 
 def build_edge_rows(triplets: list[Triplet]) -> dict[str, list[dict]]:
     """
-    Group triplets into one row list per predicate
+    Group triplets into one row per (subject, predicate, object), keyed by predicate
 
     Items are NOT split into their own node. A three-argument relation reified through a shared
     product node loses the pairing between supplier and recipient: two supply relations passing
     through the same product node imply a path that neither of them states. The item therefore
     travels as a property of the single (subject)-[predicate]->(object) edge.
 
-    Rows identical in every field are dropped, so one article restating the same fact does not
-    inflate the provenance arrays.
+    An edge gets at most one row per call even when the article named several items for it.
+    Neo4j evaluates the is_dup guard for every row of an UNWIND before any SET runs, so two rows
+    touching the same relationship would both see is_dup=false and append the same news_id
+    twice. Merging here keeps provenance at one entry per article; the first frame to reach an
+    edge owns that entry, and the items collected along the way ride along as lists.
     """
 
     grouped: dict[str, list[dict]] = defaultdict(list)
-    seen: set[tuple] = set()
+    row_by_edge: dict[tuple[str, str, str], dict] = {}
 
     for triplet in triplets:
         # The predicate is whitelisted upstream, but it is interpolated straight into the
@@ -37,23 +40,28 @@ def build_edge_rows(triplets: list[Triplet]) -> dict[str, list[dict]]:
         if triplet.predicate not in PREDICATE_DICT:
             continue
 
-        item_text = triplet.item.text if triplet.item is not None else None
-        category = triplet.item.category if triplet.item is not None else None
-        row = {
-            "subject_name": triplet.subject.text,
-            "object_name": triplet.object.text,
-            "evidence": triplet.evidence,
-            "polarity": triplet.polarity,
-            "tense": triplet.tense,
-            "item_text": item_text,
-            "category": category,
-        }
+        edge_key = (triplet.predicate, triplet.subject.text, triplet.object.text)
+        row = row_by_edge.get(edge_key)
+        if row is None:
+            row = {
+                "subject_name": triplet.subject.text,
+                "object_name": triplet.object.text,
+                "evidence": triplet.evidence,
+                "polarity": triplet.polarity,
+                "tense": triplet.tense,
+                "item_texts": [],
+                "categories": [],
+            }
+            row_by_edge[edge_key] = row
+            grouped[triplet.predicate].append(row)
 
-        key = (triplet.predicate, *row.values())
-        if key in seen:
+        if triplet.item is None:
             continue
-        seen.add(key)
-        grouped[triplet.predicate].append(row)
+        if triplet.item.text not in row["item_texts"]:
+            row["item_texts"].append(triplet.item.text)
+        category = triplet.item.category
+        if category is not None and category not in row["categories"]:
+            row["categories"].append(category)
 
     return dict(grouped)
 
@@ -62,13 +70,15 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
     """
     Write extracted triplets to Neo4j
 
-    1. Every triplet is one (subject)-[predicate]->(object) edge between Company nodes.
+    1. Every triplet is one (subject)-[predicate]->(object) edge between Company nodes. One
+       article contributes at most one provenance entry per edge, even if it names several
+       items for that edge.
     2. The same triplet reported again under the same news_id is ignored.
     3. Each edge keeps at most _MAX_PROVENANCE provenance entries (news_ids, evidences,
        polarities, tenses, mentioned_ats), evicting the oldest first. The five arrays are
        written together, so entry i of each describes the same mention.
-    4. SUPPLIES_TO edges also accumulate item_texts (raw phrases, capped and FIFO-evicted) and
-       categories (taxonomy ids, deduplicated and uncapped).
+    4. SUPPLIES_TO edges also accumulate item_texts (raw phrases, value-deduped, capped and
+       FIFO-evicted) and categories (taxonomy ids, value-deduped, uncapped).
     5. Every edge tracks first_mentioned_at, last_mentioned_at and mention_count.
     """
 
@@ -110,16 +120,15 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
                     WHEN is_dup THEN r.mentioned_ats
                     WHEN at_cap THEN r.mentioned_ats[1..] + date()
                     ELSE coalesce(r.mentioned_ats, []) + date() END,
-                r.item_texts = CASE
-                    WHEN row.item_text IS NULL THEN coalesce(r.item_texts, [])
-                    WHEN row.item_text IN coalesce(r.item_texts, []) THEN r.item_texts
-                    WHEN size(coalesce(r.item_texts, [])) >= $max_item_texts
-                        THEN r.item_texts[1..] + row.item_text
-                    ELSE coalesce(r.item_texts, []) + row.item_text END,
-                r.categories = CASE
-                    WHEN row.category IS NULL THEN coalesce(r.categories, [])
-                    WHEN row.category IN coalesce(r.categories, []) THEN r.categories
-                    ELSE coalesce(r.categories, []) + row.category END
+                r.item_texts = reduce(
+                    acc = coalesce(r.item_texts, []), t IN row.item_texts |
+                    CASE
+                        WHEN t IN acc THEN acc
+                        WHEN size(acc) >= $max_item_texts THEN acc[1..] + t
+                        ELSE acc + t END),
+                r.categories = reduce(
+                    acc = coalesce(r.categories, []), c IN row.categories |
+                    CASE WHEN c IN acc THEN acc ELSE acc + c END)
             """,
             {
                 "rows": rows,

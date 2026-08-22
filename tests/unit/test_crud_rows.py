@@ -29,8 +29,8 @@ def test_row_carries_item_text_and_category():
 
     assert row["subject_name"] == "에코프로비엠"
     assert row["object_name"] == "삼성SDI"
-    assert row["item_text"] == "하이니켈 양극재"
-    assert row["category"] == "양극재"
+    assert row["item_texts"] == ["하이니켈 양극재"]
+    assert row["categories"] == ["양극재"]
 
 
 def test_unclassified_item_keeps_the_edge_without_a_category():
@@ -38,24 +38,24 @@ def test_unclassified_item_keeps_the_edge_without_a_category():
 
     row = build_edge_rows([triplet])["SUPPLIES_TO"][0]
 
-    assert row["item_text"] == "2층 전동차 개조작업"
-    assert row["category"] is None
+    assert row["item_texts"] == ["2층 전동차 개조작업"]
+    assert row["categories"] == []
 
 
-def test_itemless_predicate_produces_null_item_fields():
+def test_itemless_predicate_produces_empty_item_lists():
     triplet = _triplet(predicate="ACQUIRES", item=None)
 
     row = build_edge_rows([triplet])["ACQUIRES"][0]
 
-    assert row["item_text"] is None
-    assert row["category"] is None
+    assert row["item_texts"] == []
+    assert row["categories"] == []
 
 
 def test_unregistered_predicate_is_dropped():
     assert build_edge_rows([_triplet(predicate="PARTNERS_WITH")]) == {}
 
 
-def test_same_pair_with_different_items_yields_two_rows():
+def test_same_pair_with_different_items_collapses_to_one_row():
     rows = build_edge_rows(
         [
             _triplet(),
@@ -63,10 +63,26 @@ def test_same_pair_with_different_items_yields_two_rows():
         ]
     )
 
-    assert len(rows["SUPPLIES_TO"]) == 2
+    assert len(rows["SUPPLIES_TO"]) == 1
+    assert rows["SUPPLIES_TO"][0]["item_texts"] == ["하이니켈 양극재", "단결정 양극재"]
 
 
 def test_identical_rows_are_deduplicated():
     rows = build_edge_rows([_triplet(), _triplet()])
 
     assert len(rows["SUPPLIES_TO"]) == 1
+    assert rows["SUPPLIES_TO"][0]["item_texts"] == ["하이니켈 양극재"]
+
+
+def test_first_frame_owns_the_provenance_of_a_merged_edge():
+    rows = build_edge_rows(
+        [
+            _triplet(evidence="첫 번째 근거 문장"),
+            _triplet(
+                item=ProductRef(text="단결정 양극재", category="양극재"),
+                evidence="두 번째 근거 문장",
+            ),
+        ]
+    )
+
+    assert rows["SUPPLIES_TO"][0]["evidence"] == "첫 번째 근거 문장"
