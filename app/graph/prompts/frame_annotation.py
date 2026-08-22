@@ -47,20 +47,20 @@ _EXAMPLES = [
     {
         "text": (
             "에코프로비엠은 국내 대표 양극재 제조사다. "
-            "이 회사는 올 하반기부터 삼성SDI에 양극재를 공급한다. "
-            "다만 회사 측은 LG에너지솔루션과 협력을 논의 중이라는 보도에 대해 사실무근이라고 밝혔다. "
-            "한편 에코프로비엠은 지난달 포스코케미칼과의 합작법인을 청산했다."
+            "이 회사는 올 하반기부터 삼성SDI에 초저온 내구성 코팅 소재를 공급하기로 했다. "
+            "다만 회사 측은 LG에너지솔루션을 인수한다는 보도에 대해 사실무근이라고 밝혔다. "
+            "한편 에코프로비엠은 지난달 체결했던 포스코케미칼과의 양극재 공급 계약을 해지했다."
         ),
         "frames": (
-            "[0] subject=에코프로비엠 | predicate=SUPPLIES_TO | object=삼성SDI | item=양극재\n"
-            "    source_sentence: 이 회사는 올 하반기부터 삼성SDI에 양극재를 공급한다.\n"
-            "    clause: 에코프로비엠은 삼성SDI에 양극재를 공급한다.\n"
-            "[1] subject=에코프로비엠 | predicate=PARTNERS_WITH | object=LG에너지솔루션 | item=없음\n"
-            "    source_sentence: 다만 회사 측은 LG에너지솔루션과 협력을 논의 중이라는 보도에 대해 사실무근이라고 밝혔다.\n"
-            "    clause: 에코프로비엠은 LG에너지솔루션과 협력한다.\n"
-            "[2] subject=에코프로비엠 | predicate=PARTNERS_WITH | object=포스코케미칼 | item=없음\n"
-            "    source_sentence: 한편 에코프로비엠은 지난달 포스코케미칼과의 합작법인을 청산했다.\n"
-            "    clause: 에코프로비엠은 포스코케미칼과 협력한다."
+            "[0] subject=에코프로비엠 | predicate=SUPPLIES_TO | object=삼성SDI | item=초저온 내구성 코팅 소재\n"
+            "    source_sentence: 이 회사는 올 하반기부터 삼성SDI에 초저온 내구성 코팅 소재를 공급하기로 했다.\n"
+            "    clause: 에코프로비엠은 삼성SDI에 초저온 내구성 코팅 소재를 공급한다.\n"
+            "[1] subject=에코프로비엠 | predicate=ACQUIRES | object=LG에너지솔루션 | item=없음\n"
+            "    source_sentence: 다만 회사 측은 LG에너지솔루션을 인수한다는 보도에 대해 사실무근이라고 밝혔다.\n"
+            "    clause: 에코프로비엠은 LG에너지솔루션을 인수한다.\n"
+            "[2] subject=에코프로비엠 | predicate=SUPPLIES_TO | object=포스코케미칼 | item=양극재\n"
+            "    source_sentence: 한편 에코프로비엠은 지난달 체결했던 포스코케미칼과의 양극재 공급 계약을 해지했다.\n"
+            "    clause: 에코프로비엠은 포스코케미칼에 양극재를 공급한다."
         ),
         "output": json.dumps(
             {
@@ -70,25 +70,25 @@ _EXAMPLES = [
                         "subject": "에코프로비엠",
                         "predicate": "SUPPLIES_TO",
                         "object": "삼성SDI",
-                        "evidence": "에코프로비엠은 올 하반기부터 삼성SDI에 양극재를 공급한다.",
+                        "evidence": "에코프로비엠은 올 하반기부터 삼성SDI에 초저온 내구성 코팅 소재를 공급하기로 했다.",
                         "polarity": "affirmed",
                         "tense": "future_or_planned",
                     },
                     {
                         "frame_index": 1,
                         "subject": "에코프로비엠",
-                        "predicate": "PARTNERS_WITH",
+                        "predicate": "ACQUIRES",
                         "object": "LG에너지솔루션",
-                        "evidence": "에코프로비엠은 LG에너지솔루션과 협력을 논의 중이라는 보도에 대해 사실무근이라고 밝혔다.",
+                        "evidence": "에코프로비엠은 LG에너지솔루션을 인수한다는 보도에 대해 사실무근이라고 밝혔다.",
                         "polarity": "denied",
                         "tense": "past_or_present_fact",
                     },
                     {
                         "frame_index": 2,
                         "subject": "에코프로비엠",
-                        "predicate": "PARTNERS_WITH",
+                        "predicate": "SUPPLIES_TO",
                         "object": "포스코케미칼",
-                        "evidence": "에코프로비엠은 지난달 포스코케미칼과의 합작법인을 청산했다.",
+                        "evidence": "에코프로비엠은 지난달 체결했던 포스코케미칼과의 양극재 공급 계약을 해지했다.",
                         "polarity": "terminated",
                         "tense": "past_or_present_fact",
                     },
