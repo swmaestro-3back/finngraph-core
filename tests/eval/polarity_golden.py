@@ -29,7 +29,7 @@ from app.graph.nodes.relation_extractor import RelationExtractor
 #
 # Note: EntityExtractor.canonicalize() rewrites company surface forms (aliases) to their
 # canonical names before extraction — this applies to company names only. Product mentions
-# are free text resolved downstream by ProductLinker, not by this canonicalizer.
+# stay as the free text the LLM copied from the article, untouched by this canonicalizer.
 _GOLDEN: list[tuple[str, dict[tuple[str, str, str], str]]] = [
     (
         "에코프로비엠은 올 하반기부터 삼성SDI에 양극재를 공급한다.",

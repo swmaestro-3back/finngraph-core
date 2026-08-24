@@ -4,7 +4,6 @@ from app.core.config import settings
 from app.graph.models import (
     CandidateFrame,
     Entity,
-    ProductRef,
     RawRelation,
     RawRelationList,
 )
@@ -58,13 +57,13 @@ def build_candidate_frames(
 
         # Product slot: accept any span the article actually contains. The substring check is
         # the only defence against an invented item, since there is no dictionary to match.
-        item_ref: ProductRef | None = None
+        item: str | None = None
         item_slot = _product_item_slot(raw_frame.predicate)
         if item_slot is not None:
             item_text = (raw_frame.item or "").strip()
             if item_text and normalize_whitespace(item_text) in normalized_text:
-                item_ref = ProductRef(text=item_text)
-            if item_slot["required"] and item_ref is None:
+                item = item_text
+            if item_slot["required"] and item is None:
                 continue
 
         # Discard if source_sentence is not in the article
@@ -79,7 +78,7 @@ def build_candidate_frames(
                 predicate=raw_frame.predicate,
                 subject=Entity(text=subject_text),
                 object=Entity(text=object_text),
-                item=item_ref,
+                item=item,
                 source_sentence=source_sentence,
                 clause=clause,
             )

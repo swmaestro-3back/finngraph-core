@@ -35,19 +35,6 @@ class Entity(BaseModel):
     text: str = Field(description="기업 표면형 (gazetteer canonical)")
 
 
-class ProductRef(BaseModel):
-    """A product-slot value: free text copied from the article, classified later.
-
-    ``text`` is what the article said; ``category`` is the taxonomy id ProductLinker
-    assigns. The category is what rolls up in the graph, the text is what is preserved.
-    """
-
-    text: str = Field(description="원문 품목 구 (예: 'HBM3E 12단')")
-    category: str | None = Field(
-        default=None, description="ProductLinker가 부여한 카테고리 id (미분류면 None)"
-    )
-
-
 # ==============================================================================
 # RelationExtractor
 # ==============================================================================
@@ -102,9 +89,12 @@ class CandidateFrame(BaseModel):
     # This holds datas that needs to be processed by FrameAnnotator
     subject: Entity = Field(description="Must exactly match an entity from the provided NER results.")
     object: Entity = Field(description="Must exactly match an entity from the provided NER results.")
-    item: ProductRef | None = Field(
+    item: str | None = Field(
         default=None,
-        description="Only set for predicates with a third 'item' argument in PREDICATE_DICT.",
+        description=(
+            "Free-text product phrase copied verbatim from the article. Only set for "
+            "predicates with a third 'item' argument in PREDICATE_DICT."
+        ),
     )
     predicate: str = Field(
         description="Must be strictly selected from the registered_predicates list."
@@ -176,29 +166,8 @@ class Triplet(BaseModel):
     subject: Entity = Field(description="주체")
     predicate: str = Field(description="술어 원형")
     object: Entity = Field(description="객체")
-    item: ProductRef | None = Field(default=None, description="품목 (3rd Argument가 필수적인 술어에서만 채워짐)")
+    item: str | None = Field(default=None, description="원문 품목 구 (3rd Argument가 필수적인 술어에서만 채워짐)")
     source_sentence: str = Field(description="관계의 근거가 된 원문 문장 (provenance)")
     evidence: str = Field(description="맥락이 복원된 자립적 근거 문장 (UI 노출용)")
     polarity: Polarity = Field(description="affirmed / denied / terminated")
     tense: Tense = Field(description="past_or_present_fact / future_or_planned / modal_possibility")
-
-
-# ==============================================================================
-# ProductLinker
-# ==============================================================================
-
-class RawItemCategory(BaseModel):
-    item_text: str = Field(description="Copy the item text back EXACTLY as given in the input list.")
-    category_id: Optional[str] = Field(
-        default=None,
-        description=(
-            "Must be one of the category ids in the provided list, or null when none of them "
-            "fits. Never invent a new category name."
-        ),
-    )
-
-
-class RawItemCategoryList(BaseModel):
-    items: List[RawItemCategory] = Field(
-        description="One entry per input item, in the same order as the input list."
-    )

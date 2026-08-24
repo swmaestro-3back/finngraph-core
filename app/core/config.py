@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     langsmith_api_key: str
     langsmith_project: str
 
+    naver_client_id: str = ""
+    naver_client_secret: str = ""
+
     bedrock_region: str = ""
     bedrock_chat_model: str = ""
     bedrock_request_timeout: int = 300

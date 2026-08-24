@@ -1,4 +1,4 @@
-from app.graph.models import Entity, ProductRef, RawRelation
+from app.graph.models import Entity, RawRelation
 from app.graph.nodes.relation_extractor import build_candidate_frames
 
 _TEXT = "에코프로비엠은 올 하반기부터 삼성SDI에 하이니켈 양극재를 공급한다."
@@ -37,7 +37,7 @@ def test_item_absent_from_any_gazetteer_is_still_extracted():
     # The whole point of the redesign: no dictionary entry is required for the item.
     frames = build_candidate_frames([_raw()], _ENTITIES, _TEXT)
 
-    assert frames[0].item == ProductRef(text="하이니켈 양극재", category=None)
+    assert frames[0].item == "하이니켈 양극재"
 
 
 def test_item_not_present_in_the_article_drops_the_frame():
@@ -57,7 +57,7 @@ def test_item_matches_ignoring_whitespace():
     frames = build_candidate_frames([_raw(item="하이니켈  양극재")], _ENTITIES, _TEXT)
 
     assert len(frames) == 1
-    assert frames[0].item == ProductRef(text="하이니켈  양극재")
+    assert frames[0].item == "하이니켈  양극재"
 
 
 def test_item_is_ignored_for_predicates_without_a_product_slot():

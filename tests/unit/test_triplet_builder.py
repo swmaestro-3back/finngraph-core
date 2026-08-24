@@ -1,4 +1,4 @@
-from app.graph.models import Entity, ProductRef, RelationFrame
+from app.graph.models import Entity, RelationFrame
 from app.graph.nodes.triplet_builder import TripletBuilder
 
 
@@ -6,7 +6,7 @@ def _frame(**overrides) -> RelationFrame:
     base = {
         "subject": Entity(text="에코프로비엠"),
         "object": Entity(text="삼성SDI"),
-        "item": ProductRef(text="하이니켈 양극재"),
+        "item": "하이니켈 양극재",
         "predicate": "SUPPLIES_TO",
         "source_sentence": "에코프로비엠은 삼성SDI에 양극재를 공급한다.",
         "clause": "에코프로비엠은 삼성SDI에 양극재를 공급한다.",
@@ -57,15 +57,7 @@ def test_item_is_carried_through_untouched():
 
     triplet = builder.build([_frame()])[0]
 
-    assert triplet.item == ProductRef(text="하이니켈 양극재", category=None)
-
-
-def test_category_survives_the_conversion():
-    builder = TripletBuilder()
-
-    frame = _frame(item=ProductRef(text="하이니켈 양극재", category="양극재"))
-
-    assert builder.build([frame])[0].item.category == "양극재"
+    assert triplet.item == "하이니켈 양극재"
 
 
 def test_frames_differing_only_in_polarity_are_both_kept():

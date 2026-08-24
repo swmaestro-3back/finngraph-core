@@ -1,0 +1,1539 @@
+{
+  "threshold": 0.35,
+  "description_weight": 0.4,
+  "document_count": 100,
+  "cluster_count": 62,
+  "singleton_count": 51,
+  "clusters": [
+    {
+      "id": 0,
+      "size": 9,
+      "cohesion": 0.5821,
+      "keywords": [
+        "한화",
+        "한화에어로스페이스",
+        "자주포",
+        "시제품",
+        "에어로스페이스"
+      ],
+      "representative": "[특징주] 한화에어로스페이스, 美 자주포 사업 시제품 계약에 3% 강세",
+      "items": [
+        {
+          "index": 5,
+          "title": "[특징주] 한화에어로, 美 육군 자주포 계약 수주 소식에 장 초반 12% 급등",
+          "link": "https://n.news.naver.com/mnews/article/366/0001187015?sid=101",
+          "pub_date": "Wed, 19 Aug 2026 09:41:00 +0900"
+        },
+        {
+          "index": 20,
+          "title": "[특징주] 한화에어로스페이스, 美육군 자주포 시제품 공급계약에 5%↑",
+          "link": "https://www.newsworks.co.kr/news/articleView.html?idxno=850778",
+          "pub_date": "Wed, 19 Aug 2026 11:02:00 +0900"
+        },
+        {
+          "index": 31,
+          "title": "[특징주] 한화에어로스페이스, 美 자주포 시제품 공급업체 단독 선정에...",
+          "link": "https://www.etoday.co.kr/news/view/2615784",
+          "pub_date": "Wed, 19 Aug 2026 09:14:00 +0900"
+        },
+        {
+          "index": 32,
+          "title": "한화에어로스페이스, 美 육군 차기 자주포 시제품 업체 선정에 8% 급등[...",
+          "link": "https://n.news.naver.com/mnews/article/018/0006353921?sid=101",
+          "pub_date": "Wed, 19 Aug 2026 09:17:00 +0900"
+        },
+        {
+          "index": 36,
+          "title": "[특징주] 한화에어로, 美 육군 차세대 자주포 시제품 계약에 상승세",
+          "link": "https://www.ajunews.com/view/20260819094706898",
+          "pub_date": "Wed, 19 Aug 2026 09:54:00 +0900"
+        },
+        {
+          "index": 37,
+          "title": "[특징주] 한화에어로스페이스, 美 육·해상 방산 사업 확대 기대에 상승",
+          "link": "https://www.newspim.com/news/view/20260819000259",
+          "pub_date": "Wed, 19 Aug 2026 09:50:00 +0900"
+        },
+        {
+          "index": 41,
+          "title": "한화에어로, 美 육군 자주포 시제품 계약 소식에 강세[특징주]",
+          "link": "https://www.newsway.co.kr/news/view?ud=2026081909292042924",
+          "pub_date": "Wed, 19 Aug 2026 09:44:00 +0900"
+        },
+        {
+          "index": 65,
+          "title": "[특징주] 한화에어로스페이스, 美 육군 자주포 수주.. 6%대 '강세'",
+          "link": "https://www.g-enews.com/view.php?ud=20260819100748864744093b5d4e_1",
+          "pub_date": "Wed, 19 Aug 2026 10:16:00 +0900"
+        },
+        {
+          "index": 82,
+          "title": "[특징주] 한화에어로스페이스, 美 자주포 사업 시제품 계약에 3% 강세",
+          "link": "https://www.kfenews.co.kr/news/articleView.html?idxno=662668",
+          "pub_date": "Wed, 19 Aug 2026 10:14:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "size": 8,
+      "cohesion": 0.4468,
+      "keywords": [
+        "북미",
+        "더본코리아",
+        "확대",
+        "가정간편식",
+        "사업"
+      ],
+      "representative": "[특징주] 더본코리아, 북미 사업 확대 기대감에 16% 강세",
+      "items": [
+        {
+          "index": 12,
+          "title": "더본코리아, 북미 소스 사업 본격화 기대에 17%↑[특징주]",
+          "link": "https://n.news.naver.com/mnews/article/018/0006353256?sid=101",
+          "pub_date": "Tue, 18 Aug 2026 09:18:00 +0900"
+        },
+        {
+          "index": 18,
+          "title": "백종원 더본코리아, 북미 사업 확대 기대감에 16% 급등 [특징주]",
+          "link": "https://n.news.naver.com/mnews/article/014/0005562733?sid=101",
+          "pub_date": "Tue, 18 Aug 2026 10:19:00 +0900"
+        },
+        {
+          "index": 19,
+          "title": "[특징주] 더본코리아, 북미 공략 본격화에 16%대 강세",
+          "link": "https://www.newspim.com/news/view/20260818000405",
+          "pub_date": "Tue, 18 Aug 2026 10:11:00 +0900"
+        },
+        {
+          "index": 22,
+          "title": "[특징주] 더본코리아, 북미 사업 확대 기대감에 16% 강세",
+          "link": "http://www.metroseoul.co.kr/article/20260818500098",
+          "pub_date": "Tue, 18 Aug 2026 10:06:00 +0900"
+        },
+        {
+          "index": 30,
+          "title": "[특징주] 더본코리아, 북미 사업 확대 기대감에 19%대 급등",
+          "link": "https://www.ajunews.com/view/20260818092545535",
+          "pub_date": "Tue, 18 Aug 2026 09:30:00 +0900"
+        },
+        {
+          "index": 40,
+          "title": "더본코리아, 북미 사업 확대에 연일 오름세…8%↑[특징주]",
+          "link": "https://n.news.naver.com/mnews/article/018/0006353912?sid=101",
+          "pub_date": "Wed, 19 Aug 2026 09:09:00 +0900"
+        },
+        {
+          "index": 43,
+          "title": "[특징주]더본코리아, 북미 사업 확대 기대감에 장 초반 7%대 강세",
+          "link": "https://www.namdonews.com/news/articleView.html?idxno=920704",
+          "pub_date": "Fri, 21 Aug 2026 09:52:00 +0900"
+        },
+        {
+          "index": 80,
+          "title": "[26.8.21 증시 인싸잇] 오늘의 특징주 - 더본코리아, ‘해외 시장 돌파구...",
+          "link": "https://www.mediawatch.kr/news/article.html?no=260733",
+          "pub_date": "Fri, 21 Aug 2026 10:36:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "size": 7,
+      "cohesion": 0.7488,
+      "keywords": [
+        "기도산업",
+        "기도",
+        "산업",
+        "보호복",
+        "제조자개발생산"
+      ],
+      "representative": "[특징주] 기도산업, 코스닥 입성 첫날 7%대 하락",
+      "items": [
+        {
+          "index": 1,
+          "title": "[특징주] 기도산업, 코스닥 입성 첫날 34% 폭락(종합)",
+          "link": "https://n.news.naver.com/mnews/article/001/0016264121?sid=101",
+          "pub_date": "Fri, 21 Aug 2026 15:52:00 +0900"
+        },
+        {
+          "index": 3,
+          "title": "[특징주] 기도산업, 코스닥 상장 첫날 14%대 급락",
+          "link": "http://www.metroseoul.co.kr/article/20260821500025",
+          "pub_date": "Fri, 21 Aug 2026 10:40:00 +0900"
+        },
+        {
+          "index": 6,
+          "title": "[특징주] 기도산업, 코스닥 상장 첫날 '급락'",
+          "link": "https://www.cstimes.com/news/articleView.html?idxno=717548",
+          "pub_date": "Fri, 21 Aug 2026 09:44:00 +0900"
+        },
+        {
+          "index": 7,
+          "title": "(특징주)기도산업, 코스닥 상장 첫날 11%대 약세",
+          "link": "http://www.newstomato.com/ReadNews.aspx?no=1310947&inflow=N",
+          "pub_date": "Fri, 21 Aug 2026 09:54:00 +0900"
+        },
+        {
+          "index": 8,
+          "title": "[특징주] 기도산업, 코스닥 상장 첫날 6%대 하락…공모가 밑돌기도",
+          "link": "https://www.ajunews.com/view/20260821100102606",
+          "pub_date": "Fri, 21 Aug 2026 10:06:00 +0900"
+        },
+        {
+          "index": 10,
+          "title": "[특징주] 기도산업, 코스닥 입성 첫날 7%대 하락",
+          "link": "https://n.news.naver.com/mnews/article/001/0016262866?sid=101",
+          "pub_date": "Fri, 21 Aug 2026 09:23:00 +0900"
+        },
+        {
+          "index": 54,
+          "title": "[특징주] 기도산업, 코스닥 입성 첫날 -15%대 하락",
+          "link": "https://www.jeonmae.co.kr/news/articleView.html?idxno=1285902",
+          "pub_date": "Fri, 21 Aug 2026 12:12:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "size": 5,
+      "cohesion": 0.5581,
+      "keywords": [
+        "해외사업",
+        "더본코리아",
+        "소스",
+        "태국",
+        "조리법"
+      ],
+      "representative": "[특징주] 더본코리아, 해외사업 확장 소식에…13% 급등",
+      "items": [
+        {
+          "index": 16,
+          "title": "[특징주] 더본코리아, 해외사업 확장 소식에…13% 급등",
+          "link": "https://n.news.naver.com/mnews/article/366/0001186220?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 09:28:00 +0900"
+        },
+        {
+          "index": 68,
+          "title": "[특징주] 더본코리아, 해외사업 확장 소식에 18%↑",
+          "link": "https://n.news.naver.com/mnews/article/031/0001049725?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 10:02:00 +0900"
+        },
+        {
+          "index": 69,
+          "title": "더본코리아, 美 소스 사업 확대 기대감에 20%대 강세 [특징주]",
+          "link": "https://n.news.naver.com/mnews/article/014/0005561570?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 09:49:00 +0900"
+        },
+        {
+          "index": 94,
+          "title": "[특징주] 더본코리아, TBK 소스 해외사업 확대에 14%대↑",
+          "link": "https://www.ajunews.com/view/20260814140331241",
+          "pub_date": "Fri, 14 Aug 2026 14:26:00 +0900"
+        },
+        {
+          "index": 95,
+          "title": "[ET특징주] '백종원' 더본코리아, 해외사업 확장 소식에 기대감… 주가...",
+          "link": "https://n.news.naver.com/mnews/article/030/0003457519?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 13:20:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "size": 4,
+      "cohesion": 0.4884,
+      "keywords": [
+        "sk하이닉스",
+        "하이닉스",
+        "자사주",
+        "sk",
+        "주주환원"
+      ],
+      "representative": "[미국 특징주] SK하이닉스 ADR, 40조 자사주 매입 발표에 개장 전 3%대 상...",
+      "items": [
+        {
+          "index": 21,
+          "title": "[미국 특징주] SK하이닉스 ADR, 40조 자사주 매입 발표에 개장 전 3%대 상...",
+          "link": "https://www.newspim.com/news/view/20260819001247",
+          "pub_date": "Wed, 19 Aug 2026 20:56:00 +0900"
+        },
+        {
+          "index": 60,
+          "title": "SK하이닉스,14일 장 초반 6%대 강세[특징주]",
+          "link": "https://n.news.naver.com/mnews/article/018/0006351606?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 09:11:00 +0900"
+        },
+        {
+          "index": 72,
+          "title": "[특징주] SK하이닉스, 40조원 자사주 매입·소각 의미는?",
+          "link": "https://www.newstnt.com/news/articleView.html?idxno=714568",
+          "pub_date": "Thu, 20 Aug 2026 12:20:00 +0900"
+        },
+        {
+          "index": 74,
+          "title": "SK하이닉스 8%대 급등…앤트로픽 성장에 '들썩' [특징주]",
+          "link": "https://n.news.naver.com/mnews/article/119/0003122540?sid=101",
+          "pub_date": "Tue, 18 Aug 2026 09:55:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "size": 4,
+      "cohesion": 0.4175,
+      "keywords": [
+        "구글",
+        "마벨",
+        "브로드컴",
+        "美증시",
+        "브로드"
+      ],
+      "representative": "[美증시 특징주] 마벨·구글 121억달러 AI칩 동맹…마벨 급등, 브로드컴...",
+      "items": [
+        {
+          "index": 26,
+          "title": "세계 최초 'mRNA 암 백신' 3상 성공…176% 폭등한 회사-[美증시 특징주]",
+          "link": "https://n.news.naver.com/mnews/article/215/0001262912?sid=101",
+          "pub_date": "Thu, 20 Aug 2026 07:03:00 +0900"
+        },
+        {
+          "index": 71,
+          "title": "[美증시 특징주] 마벨·구글 121억달러 AI칩 동맹…마벨 급등, 브로드컴...",
+          "link": "https://www.mediapen.com/news/view/1117520",
+          "pub_date": "Thu, 20 Aug 2026 04:50:00 +0900"
+        },
+        {
+          "index": 87,
+          "title": "[미국 특징주] 마벨, 구글 AI 칩 전방위 개발 맡는다…주가 12%↑",
+          "link": "https://www.newspim.com/news/view/20260819001262",
+          "pub_date": "Wed, 19 Aug 2026 22:02:00 +0900"
+        },
+        {
+          "index": 91,
+          "title": "[美증시 특징주] 팹리스 마벨 이틀째 급등 질주…구글과 AI칩 동맹효과 ...",
+          "link": "https://www.mediapen.com/news/view/1117863",
+          "pub_date": "Fri, 21 Aug 2026 04:56:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "size": 3,
+      "cohesion": 0.837,
+      "keywords": [
+        "게이츠",
+        "테라파워",
+        "hd현대중공업",
+        "hd",
+        "hd현대중"
+      ],
+      "representative": "[특징주] HD현대중, 빌 게이츠 방한·SMR 기대감 부각에 강세",
+      "items": [
+        {
+          "index": 24,
+          "title": "[특징주] HD현대중, 빌 게이츠 방한·SMR 기대감 부각에 강세",
+          "link": "https://n.news.naver.com/mnews/article/001/0016251169?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 09:21:00 +0900"
+        },
+        {
+          "index": 28,
+          "title": "[특징주] HD현대중, 빌 게이츠 방한·SMR 기대감 부각에 강세(종합)",
+          "link": "https://n.news.naver.com/mnews/article/001/0016252232?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 15:41:00 +0900"
+        },
+        {
+          "index": 96,
+          "title": "[특징주]HD현대중공업, 빌 게이츠 방한 기대감에 강세",
+          "link": "https://www.namdonews.com/news/articleView.html?idxno=920071",
+          "pub_date": "Fri, 14 Aug 2026 09:44:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "size": 3,
+      "cohesion": 0.4482,
+      "keywords": [
+        "모더나",
+        "소마젠",
+        "유전체",
+        "mrna",
+        "상한"
+      ],
+      "representative": "'모더나 훈풍'에 관련주 급등…소마젠 상한가 직행[특징주]",
+      "items": [
+        {
+          "index": 13,
+          "title": "모더나 177% 폭등에 mRNA株 들썩…나이벡 '상한가'[특징주]",
+          "link": "https://n.news.naver.com/mnews/article/018/0006354647?sid=101",
+          "pub_date": "Thu, 20 Aug 2026 09:30:00 +0900"
+        },
+        {
+          "index": 48,
+          "title": "'모더나 훈풍'에 관련주 급등…소마젠 상한가 직행[특징주]",
+          "link": "https://www.newsway.co.kr/news/view?ud=2026082009324264250",
+          "pub_date": "Thu, 20 Aug 2026 09:48:00 +0900"
+        },
+        {
+          "index": 63,
+          "title": "[특징주] 국내 모더나 관련주, 임상 3상 성공 소식.. '불기둥'",
+          "link": "https://www.g-enews.com/view.php?ud=20260820095612542944093b5d4e_1",
+          "pub_date": "Thu, 20 Aug 2026 10:08:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "size": 2,
+      "cohesion": 0.7655,
+      "keywords": [
+        "유니트리",
+        "유니",
+        "트리",
+        "생산라인",
+        "생산기지"
+      ],
+      "representative": "[중국 특징주] 유니트리, 상장 첫날 630% 급등 출발 '시총 93조 육박'",
+      "items": [
+        {
+          "index": 27,
+          "title": "[중국 특징주] 유니트리, 상장 첫날 630% 급등 출발 '시총 93조 육박'",
+          "link": "https://www.newspim.com/news/view/20260819000431",
+          "pub_date": "Wed, 19 Aug 2026 10:49:00 +0900"
+        },
+        {
+          "index": 44,
+          "title": "[중국 특징주] 유니트리, 오늘 커촹반 상장…몸값 12조원 'A주 휴머노이...",
+          "link": "https://www.newspim.com/news/view/20260819000113",
+          "pub_date": "Wed, 19 Aug 2026 08:35:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "size": 2,
+      "cohesion": 0.6703,
+      "keywords": [
+        "기가디바이스",
+        "디바이스",
+        "기가",
+        "중국",
+        "선두기업"
+      ],
+      "representative": "[중국 특징주] 기가디바이스, '메모리 호황' 속 반기 순이익 1091.5% 급증",
+      "items": [
+        {
+          "index": 86,
+          "title": "[중국 특징주] 기가디바이스, '메모리 호황' 속 반기 순이익 1091.5% 급증",
+          "link": "https://www.newspim.com/news/view/20260819000173",
+          "pub_date": "Wed, 19 Aug 2026 08:56:00 +0900"
+        },
+        {
+          "index": 98,
+          "title": "[중국 특징주] AI 연산 수요 폭증, 中 메모리 양대 선두기업 반기 순이익...",
+          "link": "https://www.newspim.com/news/view/20260819000276",
+          "pub_date": "Wed, 19 Aug 2026 09:48:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "size": 2,
+      "cohesion": 0.3522,
+      "keywords": [
+        "공급계약",
+        "한화시스템",
+        "계약금액",
+        "네이버증권",
+        "센서뷰"
+      ],
+      "representative": "[특징주] 대창솔루션, 826억원 원전·SMR 특수강 수주에 급등",
+      "items": [
+        {
+          "index": 25,
+          "title": "[특징주] 대창솔루션, 826억원 원전·SMR 특수강 수주에 급등",
+          "link": "http://www.biztribune.co.kr/news/articleView.html?idxno=357718",
+          "pub_date": "Fri, 21 Aug 2026 13:28:00 +0900"
+        },
+        {
+          "index": 75,
+          "title": "[특징주] 센서뷰, 20%대 급등… 한화시스템과 27억원 공급계약",
+          "link": "http://www.biztribune.co.kr/news/articleView.html?idxno=357585",
+          "pub_date": "Wed, 19 Aug 2026 13:06:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "가상자산",
+        "자산",
+        "가상",
+        "비트코인",
+        "위험자산"
+      ],
+      "representative": "비트코인 가격 급등에…가상자산 관련주 ‘불기둥’[특징주]",
+      "items": [
+        {
+          "index": 0,
+          "title": "비트코인 가격 급등에…가상자산 관련주 ‘불기둥’[특징주]",
+          "link": "https://n.news.naver.com/mnews/article/018/0006355478?sid=101",
+          "pub_date": "Fri, 21 Aug 2026 09:33:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "db하이텍",
+        "호황",
+        "파운드리",
+        "정체",
+        "레거시"
+      ],
+      "representative": "[특징주] DB하이텍(000990), 8인치 파운드리 호황·AI 전력 수요 수혜",
+      "items": [
+        {
+          "index": 2,
+          "title": "[특징주] DB하이텍(000990), 8인치 파운드리 호황·AI 전력 수요 수혜",
+          "link": "https://www.incheonilbo.com/news/articleView.html?idxno=1330184",
+          "pub_date": "Sun, 23 Aug 2026 19:06:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "빅테크",
+        "엔비디아",
+        "브로드컴",
+        "맞춤",
+        "브로드"
+      ],
+      "representative": "빅테크 엇갈린 행보… 브로드컴 자금 조달·엔비디아 中 맞춤 칩 주목 [...",
+      "items": [
+        {
+          "index": 4,
+          "title": "빅테크 엇갈린 행보… 브로드컴 자금 조달·엔비디아 中 맞춤 칩 주목 [...",
+          "link": "https://n.news.naver.com/mnews/article/215/0001263074?sid=101",
+          "pub_date": "Fri, 21 Aug 2026 08:15:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "전력공급",
+        "슈퍼사이클",
+        "전력기기",
+        "생산능력",
+        "社"
+      ],
+      "representative": "AI 인프라 수요에 전력공급 병목…변압기 3社, ‘슈퍼사이클’ 맞나",
+      "items": [
+        {
+          "index": 9,
+          "title": "AI 인프라 수요에 전력공급 병목…변압기 3社, ‘슈퍼사이클’ 맞나",
+          "link": "https://www.g-enews.com/view.php?ud=202608211405144942923c501012_1",
+          "pub_date": "Fri, 21 Aug 2026 14:54:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "美육군",
+        "한화",
+        "시제품",
+        "한영수",
+        "삼성증권"
+      ],
+      "representative": "[특징주] 한화에어로, 美육군 차세대 시제품 계약 소식에 상승(종합)",
+      "items": [
+        {
+          "index": 11,
+          "title": "[특징주] 한화에어로, 美육군 차세대 시제품 계약 소식에 상승(종합)",
+          "link": "https://n.news.naver.com/mnews/article/001/0016259311?sid=101",
+          "pub_date": "Wed, 19 Aug 2026 15:40:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "마이크론",
+        "보이시",
+        "워크로드",
+        "대역폭메모리",
+        "연구소"
+      ],
+      "representative": "[미국 특징주] 마이크론, 보이시에 100억달러 규모 AI 메모리 연구소 건...",
+      "items": [
+        {
+          "index": 14,
+          "title": "[미국 특징주] 마이크론, 보이시에 100억달러 규모 AI 메모리 연구소 건...",
+          "link": "https://www.newspim.com/news/view/20260821000011",
+          "pub_date": "Fri, 21 Aug 2026 02:05:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "가상화폐",
+        "비트코인",
+        "금융시장",
+        "바이백",
+        "화폐"
+      ],
+      "representative": "[특징주] 비트코인 7만 달러 돌파에… 국내 가상화폐 관련주 강세",
+      "items": [
+        {
+          "index": 15,
+          "title": "[특징주] 비트코인 7만 달러 돌파에… 국내 가상화폐 관련주 강세",
+          "link": "https://n.news.naver.com/mnews/article/366/0001187487?sid=101",
+          "pub_date": "Fri, 21 Aug 2026 09:36:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "퓨쳐켐",
+        "전립선암",
+        "품목허가",
+        "의료기관",
+        "진단"
+      ],
+      "representative": "퓨쳐켐, 전립선암 진단 신약 첫 매출 발생에 4%대 강세[특징주]",
+      "items": [
+        {
+          "index": 17,
+          "title": "퓨쳐켐, 전립선암 진단 신약 첫 매출 발생에 4%대 강세[특징주]",
+          "link": "https://n.news.naver.com/mnews/article/018/0006354652?sid=101",
+          "pub_date": "Thu, 20 Aug 2026 09:37:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "lg",
+        "휴머노이드",
+        "로봇",
+        "데이터센터",
+        "엔비디아"
+      ],
+      "representative": "[특징주] LG, 엔비디아와 휴머노이드 로봇 협력 소식에 상승(종합)",
+      "items": [
+        {
+          "index": 23,
+          "title": "[특징주] LG, 엔비디아와 휴머노이드 로봇 협력 소식에 상승(종합)",
+          "link": "https://n.news.naver.com/mnews/article/001/0016252307?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 15:59:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "한국",
+        "리벨리온",
+        "엔비디아",
+        "스타트업",
+        "선두주자"
+      ],
+      "representative": "[미국 특징주] \"엔비디아, 한국 반도체 스타트업 리벨리온과 잠재적 거...",
+      "items": [
+        {
+          "index": 29,
+          "title": "[미국 특징주] \"엔비디아, 한국 반도체 스타트업 리벨리온과 잠재적 거...",
+          "link": "https://www.newspim.com/news/view/20260822000002",
+          "pub_date": "Sat, 22 Aug 2026 00:10:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "브로드컴",
+        "브로드",
+        "기업가치",
+        "오픈ai",
+        "담보"
+      ],
+      "representative": "[미국 특징주] \"브로드컴, 고객사용 AI 칩 담보 금융 확대...최대 1000억달...",
+      "items": [
+        {
+          "index": 33,
+          "title": "[미국 특징주] \"브로드컴, 고객사용 AI 칩 담보 금융 확대...최대 1000억달...",
+          "link": "https://www.newspim.com/news/view/20260821000115",
+          "pub_date": "Fri, 21 Aug 2026 08:39:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "바이트댄스",
+        "텐센트",
+        "엔비디아",
+        "기술기업",
+        "허용"
+      ],
+      "representative": "[미국 특징주] 中, 엔비디아 H200 소량 반입 허용…바이트댄스·텐센트 ...",
+      "items": [
+        {
+          "index": 34,
+          "title": "[미국 특징주] 中, 엔비디아 H200 소량 반입 허용…바이트댄스·텐센트 ...",
+          "link": "https://www.newspim.com/news/view/20260819000654",
+          "pub_date": "Wed, 19 Aug 2026 12:57:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "어나프라주",
+        "제약",
+        "보존",
+        "호재",
+        "코리아"
+      ],
+      "representative": "[특징주] 비보존 제약, 어나프라주 잇단 호재에 '급등'",
+      "items": [
+        {
+          "index": 35,
+          "title": "[특징주] 비보존 제약, 어나프라주 잇단 호재에 '급등'",
+          "link": "https://www.cstimes.com/news/articleView.html?idxno=717221",
+          "pub_date": "Wed, 19 Aug 2026 10:16:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "지도검수",
+        "ymtc",
+        "중국",
+        "종합반도체기업",
+        "전자제품"
+      ],
+      "representative": "[중국 특징주] 中 최대 낸드플래시 업체 'YMTC', 'IPO 지도검수' 단계 진...",
+      "items": [
+        {
+          "index": 38,
+          "title": "[중국 특징주] 中 최대 낸드플래시 업체 'YMTC', 'IPO 지도검수' 단계 진...",
+          "link": "https://www.newspim.com/news/view/20260819000632",
+          "pub_date": "Wed, 19 Aug 2026 12:24:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "암호화폐",
+        "트럼프",
+        "美증시",
+        "촉구",
+        "클래리티"
+      ],
+      "representative": "트럼프 '클래리티 법안' 통과 촉구…암호화폐 관련주 연일 강세-[美증시...",
+      "items": [
+        {
+          "index": 39,
+          "title": "트럼프 '클래리티 법안' 통과 촉구…암호화폐 관련주 연일 강세-[美증시...",
+          "link": "https://n.news.naver.com/mnews/article/215/0001263093?sid=101",
+          "pub_date": "Fri, 21 Aug 2026 09:43:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "미쓰비시전기",
+        "미쓰비시",
+        "스마트에너",
+        "pci",
+        "일본"
+      ],
+      "representative": "[일본 특징주] 미쓰비시전기, 美 PCI 14억달러에 인수...북미 스마트에너...",
+      "items": [
+        {
+          "index": 42,
+          "title": "[일본 특징주] 미쓰비시전기, 美 PCI 14억달러에 인수...북미 스마트에너...",
+          "link": "https://www.newspim.com/news/view/20260821000262",
+          "pub_date": "Fri, 21 Aug 2026 09:37:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "삼성전자",
+        "준비",
+        "빅테크",
+        "추세",
+        "증권"
+      ],
+      "representative": "삼성전자, 장중 5%대 상승…증권가 “상승 추세 준비”[특징주]",
+      "items": [
+        {
+          "index": 45,
+          "title": "삼성전자, 장중 5%대 상승…증권가 “상승 추세 준비”[특징주]",
+          "link": "https://n.news.naver.com/mnews/article/018/0006350159?sid=101",
+          "pub_date": "Wed, 12 Aug 2026 10:48:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "저스텍",
+        "제조장비",
+        "모션제어",
+        "hbm",
+        "제어"
+      ],
+      "representative": "[특징주]저스텍, 또 들썩…HBM 기대에 장중 17% 급등",
+      "items": [
+        {
+          "index": 46,
+          "title": "[특징주]저스텍, 또 들썩…HBM 기대에 장중 17% 급등",
+          "link": "https://www.namdonews.com/news/articleView.html?idxno=920723",
+          "pub_date": "Fri, 21 Aug 2026 14:26:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "실리콘투",
+        "재고자산",
+        "유치",
+        "한화투자증권",
+        "분기"
+      ],
+      "representative": "[특징주] 실리콘투, 3000억 규모 투자 유치 소식에 강세",
+      "items": [
+        {
+          "index": 47,
+          "title": "[특징주] 실리콘투, 3000억 규모 투자 유치 소식에 강세",
+          "link": "http://www.metroseoul.co.kr/article/20260819500109",
+          "pub_date": "Wed, 19 Aug 2026 10:44:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "국일신동",
+        "철금속",
+        "고려아연",
+        "영업이익",
+        "기초소재"
+      ],
+      "representative": "[특징주] 고려아연·국일신동 등 비철금속 관련주, 국제 원자재 가격 급...",
+      "items": [
+        {
+          "index": 49,
+          "title": "[특징주] 고려아연·국일신동 등 비철금속 관련주, 국제 원자재 가격 급...",
+          "link": "https://www.etoday.co.kr/news/view/2616734",
+          "pub_date": "Fri, 21 Aug 2026 09:46:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "이수페타시스",
+        "하반기",
+        "고객사향",
+        "nh투자증권",
+        "o사향"
+      ],
+      "representative": "[특징주] 이수페타시스, 하반기 수익성 개선 기대에 5%↑",
+      "items": [
+        {
+          "index": 50,
+          "title": "[특징주] 이수페타시스, 하반기 수익성 개선 기대에 5%↑",
+          "link": "https://n.news.naver.com/mnews/article/031/0001050645?sid=101",
+          "pub_date": "Wed, 19 Aug 2026 09:47:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "sk하닉",
+        "대장주",
+        "주주환원",
+        "김운",
+        "대장"
+      ],
+      "representative": "[특징주] 40조 주주환원에 반도체 대장주 '환호'…삼전·SK하닉, 동반 강...",
+      "items": [
+        {
+          "index": 51,
+          "title": "[특징주] 40조 주주환원에 반도체 대장주 '환호'…삼전·SK하닉, 동반 강...",
+          "link": "https://www.etoday.co.kr/news/view/2616238",
+          "pub_date": "Thu, 20 Aug 2026 09:16:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "비보존제약",
+        "확보",
+        "후이유제약",
+        "갈리앵재단",
+        "특허"
+      ],
+      "representative": "[특징주] 비보존제약, 2Q 매출 3배 껑충·글로벌 특허 확보에 22%대 초강...",
+      "items": [
+        {
+          "index": 52,
+          "title": "[특징주] 비보존제약, 2Q 매출 3배 껑충·글로벌 특허 확보에 22%대 초강...",
+          "link": "https://www.widedaily.com/news/articleView.html?idxno=299581",
+          "pub_date": "Wed, 19 Aug 2026 09:36:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "통신장비주",
+        "통신",
+        "장비",
+        "통신장비",
+        "시장점유"
+      ],
+      "representative": "[특징주] 통신장비주 상승 사이클 오나…2027년 주파수 투자 확대 주목",
+      "items": [
+        {
+          "index": 53,
+          "title": "[특징주] 통신장비주 상승 사이클 오나…2027년 주파수 투자 확대 주목",
+          "link": "https://www.newstnt.com/news/articleView.html?idxno=714764",
+          "pub_date": "Fri, 21 Aug 2026 12:12:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "마이크로소프트",
+        "마켓플레이스",
+        "부상",
+        "고객사",
+        "버링게임"
+      ],
+      "representative": "[미국 특징주] 메타, 조용히 마이크로소프트의 주요 AI 고객사로 부상",
+      "items": [
+        {
+          "index": 55,
+          "title": "[미국 특징주] 메타, 조용히 마이크로소프트의 주요 AI 고객사로 부상",
+          "link": "https://www.newspim.com/news/view/20260821000007",
+          "pub_date": "Fri, 21 Aug 2026 01:45:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "공급과잉",
+        "중동",
+        "운임",
+        "투자의견",
+        "ls증권"
+      ],
+      "representative": "[특징주] HMM, 중동 리스크·운임 상승 기대감에 7%대 급등",
+      "items": [
+        {
+          "index": 56,
+          "title": "[특징주] HMM, 중동 리스크·운임 상승 기대감에 7%대 급등",
+          "link": "https://www.etoday.co.kr/news/view/2615376",
+          "pub_date": "Tue, 18 Aug 2026 10:08:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "모듈러주택",
+        "모듈러",
+        "공공주택",
+        "주택",
+        "엔알비"
+      ],
+      "representative": "[특징주] 정부 모듈러주택 발주 확대에 엔알비 17% ↑",
+      "items": [
+        {
+          "index": 57,
+          "title": "[특징주] 정부 모듈러주택 발주 확대에 엔알비 17% ↑",
+          "link": "https://www.newspim.com/news/view/20260820000421",
+          "pub_date": "Thu, 20 Aug 2026 10:43:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "이란",
+        "연장",
+        "다운턴",
+        "불발",
+        "휴전"
+      ],
+      "representative": "[특징주] HMM, 美-이란 휴전 연장 불발 소식에 6%대↑",
+      "items": [
+        {
+          "index": 58,
+          "title": "[특징주] HMM, 美-이란 휴전 연장 불발 소식에 6%대↑",
+          "link": "https://n.news.naver.com/mnews/article/031/0001050290?sid=101",
+          "pub_date": "Tue, 18 Aug 2026 09:47:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "저장장",
+        "호실적",
+        "앤트로픽",
+        "이란",
+        "메모리"
+      ],
+      "representative": "앤트로픽 호실적·AI 투자 가속·中 메모리 배제 기류…메모리·저장장...",
+      "items": [
+        {
+          "index": 59,
+          "title": "앤트로픽 호실적·AI 투자 가속·中 메모리 배제 기류…메모리·저장장...",
+          "link": "https://n.news.naver.com/mnews/article/215/0001262641?sid=101",
+          "pub_date": "Tue, 18 Aug 2026 07:27:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "투데이",
+        "투자심리",
+        "한화",
+        "전술포",
+        "계약"
+      ],
+      "representative": "[투데이's 특징주] 한화에어로, 美 육군 자주포 계약 수주 소식에 장 초...",
+      "items": [
+        {
+          "index": 61,
+          "title": "[투데이's 특징주] 한화에어로, 美 육군 자주포 계약 수주 소식에 장 초...",
+          "link": "https://www.todaykorea.co.kr/news/articleView.html?idxno=405067",
+          "pub_date": "Wed, 19 Aug 2026 10:08:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "사이버캡",
+        "테슬라",
+        "美증시",
+        "세미",
+        "비트코인"
+      ],
+      "representative": "[美증시 특징주] 테슬라 오랜만에 급등…사이버캡 출시 기대에 비트코인...",
+      "items": [
+        {
+          "index": 62,
+          "title": "[美증시 특징주] 테슬라 오랜만에 급등…사이버캡 출시 기대에 비트코인...",
+          "link": "https://www.mediapen.com/news/view/1118157",
+          "pub_date": "Sat, 22 Aug 2026 04:30:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "정면돌",
+        "하락장서",
+        "백종원",
+        "북미",
+        "썬레이그룹"
+      ],
+      "representative": "[특징주]더본코리아, 코스닥 하락장서 21% 치솟아…백종원 '북미 정면돌...",
+      "items": [
+        {
+          "index": 64,
+          "title": "[특징주]더본코리아, 코스닥 하락장서 21% 치솟아…백종원 '북미 정면돌...",
+          "link": "https://www.namdonews.com/news/articleView.html?idxno=920303",
+          "pub_date": "Tue, 18 Aug 2026 13:24:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "ls일렉트릭",
+        "일렉트릭",
+        "데이터센터",
+        "하이퍼스케일",
+        "와이오밍주"
+      ],
+      "representative": "[26.8.18 증시 인싸잇] 오늘의 특징주 - LS일렉트릭, 견조한 실적에 해외...",
+      "items": [
+        {
+          "index": 66,
+          "title": "[26.8.18 증시 인싸잇] 오늘의 특징주 - LS일렉트릭, 견조한 실적에 해외...",
+          "link": "https://www.mediawatch.kr/news/article.html?no=260702",
+          "pub_date": "Tue, 18 Aug 2026 13:36:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "포인트모바일",
+        "서프라이즈",
+        "아마존",
+        "모바일",
+        "어닝"
+      ],
+      "representative": "상반기 어닝 서프라이즈…포인트모바일 7%↑[특징주]",
+      "items": [
+        {
+          "index": 67,
+          "title": "상반기 어닝 서프라이즈…포인트모바일 7%↑[특징주]",
+          "link": "https://n.news.naver.com/mnews/article/018/0006351615?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 09:20:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "대한항공",
+        "국제선",
+        "국제유가",
+        "유류할증료",
+        "회복"
+      ],
+      "representative": "[특징주]대한항공, 국제선 회복·통합 시너지 기대에 강세…2만5800원 터...",
+      "items": [
+        {
+          "index": 70,
+          "title": "[특징주]대한항공, 국제선 회복·통합 시너지 기대에 강세…2만5800원 터...",
+          "link": "https://www.namdonews.com/news/articleView.html?idxno=920722",
+          "pub_date": "Fri, 21 Aug 2026 14:26:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "토마호크",
+        "rtx",
+        "무기",
+        "정밀유도무기",
+        "해군"
+      ],
+      "representative": "[미국 특징주] RTX, 美 해군과 토마호크 229억달러 계약",
+      "items": [
+        {
+          "index": 73,
+          "title": "[미국 특징주] RTX, 美 해군과 토마호크 229억달러 계약",
+          "link": "https://www.newspim.com/news/view/20260818000042",
+          "pub_date": "Tue, 18 Aug 2026 08:07:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "호르무즈",
+        "sk그린로지스",
+        "운임",
+        "통항",
+        "긴장"
+      ],
+      "representative": "호르무즈 긴장 지속…운임 상승 기대에 SK그린로지스 7%대 강세[특징주...",
+      "items": [
+        {
+          "index": 76,
+          "title": "호르무즈 긴장 지속…운임 상승 기대에 SK그린로지스 7%대 강세[특징주...",
+          "link": "https://www.newsway.co.kr/news/view?ud=2026082109250789695",
+          "pub_date": "Fri, 21 Aug 2026 09:40:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "세레브라스",
+        "컴퓨터",
+        "신형",
+        "격차",
+        "엔비디아와"
+      ],
+      "representative": "[미국 특징주] 세레브라스, 신형 AI 컴퓨터 공개 \"엔비디아와 격차 더 벌...",
+      "items": [
+        {
+          "index": 77,
+          "title": "[미국 특징주] 세레브라스, 신형 AI 컴퓨터 공개 \"엔비디아와 격차 더 벌...",
+          "link": "https://www.newspim.com/news/view/20260819000811",
+          "pub_date": "Wed, 19 Aug 2026 13:59:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "공급국",
+        "etf",
+        "옥수수",
+        "선물",
+        "corn"
+      ],
+      "representative": "[ETF 특징주] 옥수수 선물 18개월 만에 최고치, CORN 동반 강세",
+      "items": [
+        {
+          "index": 78,
+          "title": "[ETF 특징주] 옥수수 선물 18개월 만에 최고치, CORN 동반 강세",
+          "link": "https://www.newspim.com/news/view/20260820001117",
+          "pub_date": "Thu, 20 Aug 2026 16:11:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "애플",
+        "역상관",
+        "脫",
+        "발목",
+        "포지션"
+      ],
+      "representative": "[미국 특징주] 애플의 '탈(脫)AI' 포지션, 갑자기 주가의 발목을 잡다",
+      "items": [
+        {
+          "index": 79,
+          "title": "[미국 특징주] 애플의 '탈(脫)AI' 포지션, 갑자기 주가의 발목을 잡다",
+          "link": "https://www.newspim.com/news/view/20260819000013",
+          "pub_date": "Wed, 19 Aug 2026 01:38:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "핵심광물",
+        "엠피머티리얼즈",
+        "희토",
+        "미국",
+        "배경"
+      ],
+      "representative": "[미국 특징주] 9.10% 오른 엠피머티리얼즈, 희토류주 동반 강세",
+      "items": [
+        {
+          "index": 81,
+          "title": "[미국 특징주] 9.10% 오른 엠피머티리얼즈, 희토류주 동반 강세",
+          "link": "https://www.tokenpost.kr/news/market/395394",
+          "pub_date": "Sat, 22 Aug 2026 06:20:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "sk케미칼",
+        "et특징주",
+        "특구향",
+        "분산에너지",
+        "sk멀티유틸리티"
+      ],
+      "representative": "[ET특징주]SK케미칼, 2분기 최대 매출에 상승세",
+      "items": [
+        {
+          "index": 83,
+          "title": "[ET특징주]SK케미칼, 2분기 최대 매출에 상승세",
+          "link": "https://n.news.naver.com/mnews/article/030/0003457451?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 10:26:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "엔비디아",
+        "과대평가",
+        "bofa",
+        "리스크",
+        "아리야"
+      ],
+      "representative": "[미국 특징주] BofA \"엔비디아, AI 리스크 과대평가로 최대 50% 저평가\"",
+      "items": [
+        {
+          "index": 84,
+          "title": "[미국 특징주] BofA \"엔비디아, AI 리스크 과대평가로 최대 50% 저평가\"",
+          "link": "https://www.newspim.com/news/view/20260819000015",
+          "pub_date": "Wed, 19 Aug 2026 01:53:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "nhn",
+        "nhn클라우드",
+        "영업익",
+        "역대",
+        "분기"
+      ],
+      "representative": "NHN, 13%대 급등…2분기 영업익 164%↑ '역대 최대'[특징주]",
+      "items": [
+        {
+          "index": 85,
+          "title": "NHN, 13%대 급등…2분기 영업익 164%↑ '역대 최대'[특징주]",
+          "link": "https://n.news.naver.com/mnews/article/018/0006349259?sid=101",
+          "pub_date": "Tue, 11 Aug 2026 09:11:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "바이킹",
+        "예약",
+        "크루즈",
+        "견고",
+        "고급"
+      ],
+      "representative": "[미국 특징주] 바이킹, 2027년 예약률 53% \"고급 크루즈 수요 견고\"",
+      "items": [
+        {
+          "index": 88,
+          "title": "[미국 특징주] 바이킹, 2027년 예약률 53% \"고급 크루즈 수요 견고\"",
+          "link": "https://www.newspim.com/news/view/20260820000828",
+          "pub_date": "Thu, 20 Aug 2026 14:15:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "은성fa",
+        "데이터센터",
+        "케이엔에스",
+        "은성",
+        "버스덕"
+      ],
+      "representative": "[특징주] 케이엔에스, 30% 급등 상한가…자회사 은성FA 美 데이터센터 수...",
+      "items": [
+        {
+          "index": 89,
+          "title": "[특징주] 케이엔에스, 30% 급등 상한가…자회사 은성FA 美 데이터센터 수...",
+          "link": "https://www.widedaily.com/news/articleView.html?idxno=299697",
+          "pub_date": "Thu, 20 Aug 2026 10:22:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "ugi",
+        "kkr",
+        "제안",
+        "인공지능",
+        "인수"
+      ],
+      "representative": "[미국 특징주] UGI, KKR의 인수 제안 보도에 한때 11% 급등",
+      "items": [
+        {
+          "index": 90,
+          "title": "[미국 특징주] UGI, KKR의 인수 제안 보도에 한때 11% 급등",
+          "link": "https://www.newspim.com/news/view/20260819000154",
+          "pub_date": "Wed, 19 Aug 2026 08:48:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "숏폼",
+        "콰이서우",
+        "홍콩",
+        "드라마",
+        "동영상"
+      ],
+      "representative": "[홍콩 특징주] 콰이서우 AI 동영상 '커링AI', 매출 200% 폭증",
+      "items": [
+        {
+          "index": 92,
+          "title": "[홍콩 특징주] 콰이서우 AI 동영상 '커링AI', 매출 200% 폭증",
+          "link": "https://www.newspim.com/news/view/20260820000045",
+          "pub_date": "Thu, 20 Aug 2026 07:56:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "코오롱글로벌",
+        "증축공사",
+        "통합용수공급사업",
+        "산업단지",
+        "엔진정비공장"
+      ],
+      "representative": "[특징주] 코오롱글로벌, 2분기 어닝 서프…장 초반 15%대 급등",
+      "items": [
+        {
+          "index": 93,
+          "title": "[특징주] 코오롱글로벌, 2분기 어닝 서프…장 초반 15%대 급등",
+          "link": "https://www.etoday.co.kr/news/view/2613545",
+          "pub_date": "Wed, 12 Aug 2026 09:18:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "반도체주",
+        "빅테크",
+        "美증시",
+        "텍사스주",
+        "경신"
+      ],
+      "representative": "S&P 500, 빅테크·반도체주 강세 속 최고치 경신 [ 美증시 특징주 ]",
+      "items": [
+        {
+          "index": 97,
+          "title": "S&P 500, 빅테크·반도체주 강세 속 최고치 경신 [ 美증시 특징주 ]",
+          "link": "https://n.news.naver.com/mnews/article/215/0001262328?sid=101",
+          "pub_date": "Fri, 14 Aug 2026 07:17:00 +0900"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "size": 1,
+      "cohesion": 1.0,
+      "keywords": [
+        "lk삼양",
+        "삼양",
+        "모듈",
+        "lk",
+        "드론"
+      ],
+      "representative": "[특징주] LK삼양, 국방 드론 모듈 공급 소식에 26% 급등",
+      "items": [
+        {
+          "index": 99,
+          "title": "[특징주] LK삼양, 국방 드론 모듈 공급 소식에 26% 급등",
+          "link": "https://www.etoday.co.kr/news/view/2613060",
+          "pub_date": "Tue, 11 Aug 2026 09:16:00 +0900"
+        }
+      ]
+    }
+  ]
+}

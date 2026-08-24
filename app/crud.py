@@ -64,18 +64,14 @@ def build_edge_rows(triplets: list[Triplet]) -> dict[str, list[dict]]:
                 "polarity": triplet.polarity,
                 "tense": triplet.tense,
                 "item_texts": [],
-                "categories": [],
             }
             row_by_edge[edge_key] = row
             grouped[triplet.predicate].append(row)
 
         if triplet.item is None:
             continue
-        if triplet.item.text not in row["item_texts"]:
-            row["item_texts"].append(triplet.item.text)
-        category = triplet.item.category
-        if category is not None and category not in row["categories"]:
-            row["categories"].append(category)
+        if triplet.item not in row["item_texts"]:
+            row["item_texts"].append(triplet.item)
 
     return dict(grouped)
 
@@ -92,7 +88,7 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
        polarities, tenses, mentioned_ats), evicting the oldest first. The five arrays are
        written together, so entry i of each describes the same mention.
     4. SUPPLIES_TO edges also accumulate item_texts (raw phrases, value-deduped, capped and
-       FIFO-evicted) and categories (taxonomy ids, value-deduped, uncapped).
+       FIFO-evicted).
     5. Every edge tracks first_mentioned_at, last_mentioned_at and mention_count.
     """
 
@@ -100,9 +96,9 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
     # planner inserts an Eager between WITH and SET, evaluating is_dup for every row up front),
     # so duplicates within a batch are filtered by build_edge_rows instead.
     for predicate, rows in build_edge_rows(triplets).items():
-        # item_texts/categories belong only on predicates that declare a product item
-        # (SUPPLIES_TO today). Emitting them for INVESTS_IN/ACQUIRES would just write []
-        # onto every such edge, since those triplets never carry an item.
+        # item_texts belongs only on predicates that declare a product item (SUPPLIES_TO
+        # today). Emitting it for INVESTS_IN/ACQUIRES would just write [] onto every such
+        # edge, since those triplets never carry an item.
         item_clause = (
             """,
                 r.item_texts = reduce(
@@ -110,10 +106,7 @@ async def upsert_triplets(news_id: str, triplets: list[Triplet]) -> None:
                     CASE
                         WHEN t IN acc THEN acc
                         WHEN size(acc) >= $max_item_texts THEN acc[1..] + t
-                        ELSE acc + t END),
-                r.categories = reduce(
-                    acc = coalesce(r.categories, []), c IN row.categories |
-                    CASE WHEN c IN acc THEN acc ELSE acc + c END)"""
+                        ELSE acc + t END)"""
             if _predicate_has_item_slot(predicate)
             else ""
         )

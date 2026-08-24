@@ -3,8 +3,8 @@ from flashtext import KeywordProcessor
 from app.graph.models import Entity
 from app.graph.ontology.gazetteers import COMPANY_DICT
 
-# Pre-built knowledge base dict. Only companies are gazetteer-anchored; products are free
-# text extracted by the LLM and classified downstream by ProductLinker.
+# Pre-built knowledge base dict. Only companies are gazetteer-anchored; products stay as the
+# free text the LLM copied out of the article.
 GAZETTEERS: dict[str, dict[str, list[str]]] = {
     "COMPANY": COMPANY_DICT,
 }

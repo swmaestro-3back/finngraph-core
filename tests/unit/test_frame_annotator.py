@@ -1,10 +1,10 @@
-from app.graph.models import CandidateFrame, Entity, ProductRef, RawAnnotation
+from app.graph.models import CandidateFrame, Entity, RawAnnotation
 from app.graph.nodes.frame_annotator import format_candidates, merge_annotations
 
 _CANDIDATE = CandidateFrame(
     subject=Entity(text="에코프로비엠"),
     object=Entity(text="삼성SDI"),
-    item=ProductRef(text="하이니켈 양극재"),
+    item="하이니켈 양극재",
     predicate="SUPPLIES_TO",
     source_sentence="이 회사는 올 하반기부터 삼성SDI에 하이니켈 양극재를 공급한다.",
     clause="에코프로비엠은 삼성SDI에 하이니켈 양극재를 공급한다.",

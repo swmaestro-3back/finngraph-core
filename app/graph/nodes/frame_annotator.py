@@ -22,7 +22,7 @@ def format_candidates(candidates: list[CandidateFrame]) -> str:
 
     lines: list[str] = []
     for index, candidate in enumerate(candidates):
-        item_text = candidate.item.text if candidate.item is not None else "없음"
+        item_text = candidate.item if candidate.item is not None else "없음"
         lines.append(
             f"[{index}] subject={candidate.subject.text} | predicate={candidate.predicate} "
             f"| object={candidate.object.text} | item={item_text}"
@@ -43,7 +43,7 @@ def _is_grounded(evidence: str, candidate: CandidateFrame) -> bool:
 
     required = [candidate.subject.text, candidate.object.text]
     if candidate.item is not None:
-        required.append(candidate.item.text)
+        required.append(candidate.item)
 
     normalized_evidence = normalize_whitespace(evidence)
     return all(normalize_whitespace(term) in normalized_evidence for term in required)

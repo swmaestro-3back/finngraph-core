@@ -1,5 +1,5 @@
 from app.crud import _predicate_has_item_slot, build_edge_rows
-from app.graph.models import Entity, ProductRef, Triplet
+from app.graph.models import Entity, Triplet
 
 
 def _triplet(**overrides) -> Triplet:
@@ -7,7 +7,7 @@ def _triplet(**overrides) -> Triplet:
         "subject": Entity(text="에코프로비엠"),
         "predicate": "SUPPLIES_TO",
         "object": Entity(text="삼성SDI"),
-        "item": ProductRef(text="하이니켈 양극재", category="양극재"),
+        "item": "하이니켈 양극재",
         "source_sentence": "에코프로비엠은 삼성SDI에 하이니켈 양극재를 공급한다.",
         "evidence": "에코프로비엠은 올 하반기부터 삼성SDI에 하이니켈 양극재를 공급한다.",
         "polarity": "affirmed",
@@ -24,22 +24,12 @@ def test_supply_triplet_becomes_one_direct_edge():
     assert len(rows["SUPPLIES_TO"]) == 1
 
 
-def test_row_carries_item_text_and_category():
+def test_row_carries_item_text():
     row = build_edge_rows([_triplet()])["SUPPLIES_TO"][0]
 
     assert row["subject_name"] == "에코프로비엠"
     assert row["object_name"] == "삼성SDI"
     assert row["item_texts"] == ["하이니켈 양극재"]
-    assert row["categories"] == ["양극재"]
-
-
-def test_unclassified_item_keeps_the_edge_without_a_category():
-    triplet = _triplet(item=ProductRef(text="2층 전동차 개조작업", category=None))
-
-    row = build_edge_rows([triplet])["SUPPLIES_TO"][0]
-
-    assert row["item_texts"] == ["2층 전동차 개조작업"]
-    assert row["categories"] == []
 
 
 def test_itemless_predicate_produces_empty_item_lists():
@@ -48,7 +38,6 @@ def test_itemless_predicate_produces_empty_item_lists():
     row = build_edge_rows([triplet])["ACQUIRES"][0]
 
     assert row["item_texts"] == []
-    assert row["categories"] == []
 
 
 def test_unregistered_predicate_is_dropped():
@@ -59,7 +48,7 @@ def test_same_pair_with_different_items_collapses_to_one_row():
     rows = build_edge_rows(
         [
             _triplet(),
-            _triplet(item=ProductRef(text="단결정 양극재", category="양극재")),
+            _triplet(item="단결정 양극재"),
         ]
     )
 
@@ -76,8 +65,8 @@ def test_identical_rows_are_deduplicated():
 
 def test_predicate_has_item_slot_is_derived_from_predicate_dict():
     """SUPPLIES_TO declares a third PRODUCT argument; INVESTS_IN and ACQUIRES do not. The
-    item_texts/categories SET clauses in upsert_triplets are only emitted for predicates
-    where this returns True, so INVESTS_IN/ACQUIRES edges no longer get [] written onto them."""
+    item_texts SET clause in upsert_triplets is only emitted for predicates where this
+    returns True, so INVESTS_IN/ACQUIRES edges no longer get [] written onto them."""
     assert _predicate_has_item_slot("SUPPLIES_TO") is True
     assert _predicate_has_item_slot("INVESTS_IN") is False
     assert _predicate_has_item_slot("ACQUIRES") is False
@@ -89,7 +78,7 @@ def test_first_frame_owns_the_provenance_of_a_merged_edge():
         [
             _triplet(evidence="첫 번째 근거 문장"),
             _triplet(
-                item=ProductRef(text="단결정 양극재", category="양극재"),
+                item="단결정 양극재",
                 evidence="두 번째 근거 문장",
             ),
         ]
